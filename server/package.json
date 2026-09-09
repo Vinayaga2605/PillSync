@@ -1,0 +1,15 @@
+{
+  "name": "pillsync-medicine-server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "commonjs",
+  "description": "Backend for PillSync Module 3 — Medicine Management (Add/List/Details/Edit/Delete).",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
