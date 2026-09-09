@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --color-primary: #2f8f7f;
+  --color-primary-light: #e6f4f1;
+  --color-primary-dark: #1f6b5e;
+  --color-primary-deep: #14483f;
+
+  --color-accent-blue: #4a90c4;
+  --color-accent-blue-light: #eaf3fa;
+
+  --color-success: #2e9e6a;
+  --color-success-bg: #e5f7ee;
+  --color-warning: #d9992e;
+  --color-warning-bg: #fdf3e2;
+  --color-danger: #d1584f;
+  --color-danger-bg: #fbe9e7;
+
+  --color-text: #16221f;
+  --color-text-muted: #667572;
+  --color-text-faint: #9aa8a5;
+
+  --color-bg: #f4f8f7;
+  --color-surface: #ffffff;
+  --color-surface-alt: #fbfdfc;
+  --color-border: #e6efec;
+  --color-border-strong: #d3e2dd;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(20, 72, 63, 0.04);
+  --shadow-soft: 0 1px 2px rgba(20, 72, 63, 0.04),
+    0 6px 16px rgba(20, 72, 63, 0.06);
+  --shadow-hover: 0 2px 6px rgba(20, 72, 63, 0.08),
+    0 12px 28px rgba(20, 72, 63, 0.10);
+  --shadow-focus: 0 0 0 4px rgba(47, 143, 127, 0.14);
+
+  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  font-family: var(--font-main);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::selection {
+  background: var(--color-primary-light);
+  color: var(--color-primary-deep);
+}
+
+/* Reusable card treatment */
+.surface-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+/* =========================
+   DARK MODE
+   ========================= */
+
+html[data-theme="dark"] {
+  --color-primary-light: #1c3a32;
+  --color-bg: #0d1714;
+  --color-surface: #162b25;
+  --color-surface-alt: #1c3a32;
+  --color-border: #29483f;
+  --color-border-strong: #365d51;
+
+  --color-text: #eaf5f1;
+  --color-text-muted: #a9c2ba;
+  --color-text-faint: #7d9a91;
+
+  --color-primary: #48b09b;
+  --color-primary-dark: #3b9c89;
+  --color-primary-deep: #70cbb8;
+
+  --color-accent-blue: #6ba9d4;
+  --color-accent-blue-light: #203a4c;
+
+  --color-success: #54c58e;
+  --color-success-bg: #173b2d;
+
+  --color-warning: #e5ad4e;
+  --color-warning-bg: #3c301b;
+
+  --color-danger: #e27a70;
+  --color-danger-bg: #3d211f;
+}
+
+/* Make the actual page background follow the theme */
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Smooth theme transition */
+html,
+body,
+.surface-card {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* Simple entrance animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-layout-content > .page-body > * {
+  animation: fadeIn 0.25s ease;
+}
+
+/* Accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
