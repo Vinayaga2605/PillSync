@@ -1,0 +1,6 @@
+﻿venv/
+__pycache__/
+*.pyc
+scratch/
+start.bat
+backend/.env
