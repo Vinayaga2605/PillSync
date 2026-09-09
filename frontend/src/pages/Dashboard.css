@@ -1,0 +1,277 @@
+.dashboard-container{
+
+    min-height:100vh;
+
+    background:#f4faf5;
+
+    font-family:Arial, sans-serif;
+
+}
+
+
+
+/* Navbar */
+
+.navbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:20px 40px;
+
+    background:white;
+
+    box-shadow:0px 3px 10px rgba(0,0,0,0.1);
+
+}
+
+
+
+.logo{
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    color:#2e8b57;
+
+}
+
+
+
+.nav-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+
+
+.profile{
+
+    color:#555;
+
+}
+
+
+
+.logout-btn{
+
+    background:#e74c3c;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 22px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+}
+
+
+.logout-btn:hover{
+
+    background:#c0392b;
+
+}
+
+
+
+/* Welcome */
+
+
+.welcome-section{
+
+    text-align:center;
+
+    padding:40px;
+
+}
+
+
+
+.welcome-section h1{
+
+    color:#2e8b57;
+
+    font-size:32px;
+
+}
+
+
+.welcome-section p{
+
+    color:#666;
+
+    font-size:18px;
+
+}
+
+
+
+
+
+/* Cards */
+
+
+.dashboard-cards{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:30px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.dashboard-card{
+
+    width:280px;
+
+    background:white;
+
+    padding:30px;
+
+    text-align:center;
+
+    border-radius:20px;
+
+    box-shadow:0px 5px 20px rgba(0,0,0,0.12);
+
+}
+
+
+
+.icon{
+
+    font-size:45px;
+
+}
+
+
+.dashboard-card h3{
+
+    color:#333;
+
+}
+
+
+
+.dashboard-card p{
+
+    color:#666;
+
+    height:45px;
+
+}
+
+
+
+.dashboard-card button{
+
+    margin-top:20px;
+
+    padding:12px 25px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2e8b57;
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+
+
+.dashboard-card button:hover{
+
+    background:#246b45;
+
+}
+
+
+
+
+
+/* Summary */
+
+
+.summary-box{
+
+    width:80%;
+
+    margin:50px auto;
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    box-shadow:0px 5px 20px rgba(0,0,0,0.1);
+
+}
+
+
+
+.summary-box h2{
+
+    text-align:center;
+
+    color:#2e8b57;
+
+}
+
+
+
+.summary-items{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:80px;
+
+    text-align:center;
+
+}
+
+
+
+.summary-items h3{
+
+    font-size:30px;
+
+    color:#2e8b57;
+
+    margin-bottom:5px;
+
+}
+
+
+
+.summary-items p{
+
+    color:#555;
+
+}
