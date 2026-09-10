@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+﻿import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ocrService from "../../services/ocrService";
 
@@ -184,7 +184,7 @@ const MedicineUpload = () => {
       {step === STEPS.PROCESSING && (
         <div className="upload-processing">
           <div className="spinner" />
-          <h3>Reading your prescription…</h3>
+          <h3>Reading your prescriptionâ€¦</h3>
           <p>This usually takes a few seconds</p>
         </div>
       )}
@@ -258,7 +258,7 @@ const MedicineUpload = () => {
               onClick={handleConfirmSave}
               disabled={saving}
             >
-              {saving ? "Saving…" : "Confirm & Save"}
+              {saving ? "Savingâ€¦" : "Confirm & Save"}
             </button>
           </div>
         </div>
@@ -288,3 +288,7 @@ const MedicineUpload = () => {
 };
 
 export default MedicineUpload;
+
+
+
+

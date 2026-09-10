@@ -1,4 +1,4 @@
-import api from "./api";
+﻿import api from "./api";
 
 const medicationService = {
   // Get all medicines for the logged-in patient
@@ -46,3 +46,6 @@ const medicationService = {
 };
 
 export default medicationService;
+
+
+

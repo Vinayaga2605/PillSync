@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+﻿import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { Pill, Lock, User, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
@@ -89,7 +89,7 @@ return ( <div className="login-page">
 
       <p>
         Manage your medications, prescriptions and reminders
-        effortlessly — all in one secure place.
+        effortlessly â€” all in one secure place.
       </p>
 
       <div className="login-features">
@@ -120,7 +120,7 @@ return ( <div className="login-page">
     </div>
 
     <div className="login-left-footer">
-      © {new Date().getFullYear()} PillSync
+      (c) {new Date().getFullYear()} PillSync
     </div>
   </div>
 
@@ -257,3 +257,7 @@ return ( <div className="login-page">
 };
 
 export default Login;
+
+
+
+

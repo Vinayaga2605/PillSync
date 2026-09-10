@@ -1,4 +1,4 @@
-import api from "./api";
+﻿import api from "./api";
 
 const analyticsService = {
   getAdherenceTrend: () =>
@@ -27,3 +27,7 @@ const analyticsService = {
 };
 
 export default analyticsService;
+
+
+
+

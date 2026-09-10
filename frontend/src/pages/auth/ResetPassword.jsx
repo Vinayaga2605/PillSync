@@ -1,65 +1,56 @@
-import React, { useState } from "react";
-import {
-  useNavigate,
-  useSearchParams,
-  Link,
-} from "react-router-dom";
+﻿import React, { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import "./ResetPassword.css";
 import authService from "../../services/authService";
 
-const ResetPassword = () => {
+function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const token = searchParams.get("token") || "";
+  const uid = searchParams.get("uid");
+  const token = searchParams.get("token");
 
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
-
-  const [error, setError] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
 
-    setError("");
-
-    if (password.length < 6) {
-      setError(
-        "Password must be at least 6 characters."
-      );
+    if (!uid || !token) {
+      alert("Invalid or expired reset link.");
       return;
     }
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+    if (!newPassword.trim() || !confirmPassword.trim()) {
+      alert("Please enter both passwords");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      alert("Password must contain at least 8 characters");
       return;
     }
 
     setLoading(true);
 
     try {
-      await authService.resetPassword(
-        token,
-        password
-      );
+      await authService.resetPassword(token, newPassword);
 
-      setSuccess(true);
+      alert("Password changed successfully!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Reset password error:", error);
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    } catch (err) {
-      console.error(
-        "Reset password failed:",
-        err
-      );
-
-      setError(
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        "Unable to reset password. The link may have expired."
+      alert(
+        error?.response?.data?.detail ||
+          error?.response?.data?.message ||
+          "Password reset failed"
       );
     } finally {
       setLoading(false);
@@ -67,110 +58,53 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
+    <div className="reset-container">
+      <h1>PillSync</h1>
 
-        <div className="auth-brand">
-          <div className="auth-brand-icon">
-            <span>💊</span>
-          </div>
+      <h2>Reset Password</h2>
 
-          <div>
-            <div className="auth-brand-name">
-              PillSync
-            </div>
+      <p className="reset-info">
+        Enter your new password below.
+      </p>
 
-            <div className="auth-brand-tagline">
-              Medication management made simple
-            </div>
-          </div>
-        </div>
+      <form onSubmit={handleReset}>
+        <label>New Password</label>
 
-        <h1 className="auth-title">
-          Reset your password
-        </h1>
+        <input
+          type="password"
+          placeholder="Enter new password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
 
-        <p className="auth-subtitle">
-          Choose a new password for your account.
-        </p>
+        <label>Confirm Password</label>
 
-        {error && (
-          <div className="auth-error" role="alert">
-            {error}
-          </div>
-        )}
+        <input
+          type="password"
+          placeholder="Re-enter new password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
 
-        {success ? (
-          <div className="auth-success">
-            <strong>Password reset successful!</strong>
+        <button type="submit" disabled={loading}>
+          {loading ? "Changing Password..." : "Reset Password"}
+        </button>
+      </form>
 
-            <br />
-
-            Redirecting you to the login page...
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="auth-form"
-          >
-
-            <label className="auth-label">
-              New Password
-
-              <input
-                type="password"
-                value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
-                required
-                minLength={6}
-                autoComplete="new-password"
-                placeholder="At least 6 characters"
-                disabled={loading}
-              />
-            </label>
-
-            <label className="auth-label">
-              Confirm Password
-
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(
-                    e.target.value
-                  )
-                }
-                required
-                autoComplete="new-password"
-                placeholder="Re-enter your password"
-                disabled={loading}
-              />
-            </label>
-
-            <button
-              type="submit"
-              className="auth-btn"
-              disabled={loading}
-            >
-              {loading
-                ? "Resetting..."
-                : "Reset Password"}
-            </button>
-
-          </form>
-        )}
-
-        <p className="auth-footer">
-          <Link to="/login">
-            Back to login
-          </Link>
-        </p>
-
-      </div>
+      <p>
+        Go back to{" "}
+        <span
+          className="login-link"
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </span>
+      </p>
     </div>
   );
-};
+}
 
 export default ResetPassword;
+
+
+

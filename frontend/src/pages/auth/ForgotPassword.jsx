@@ -1,30 +1,48 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+﻿import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./ForgotPassword.css";
 import authService from "../../services/authService";
 
-const ForgotPassword = () => {
+function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const navigate = useNavigate();
+
+  const handleReset = async (e) => {
     e.preventDefault();
 
+    setMessage("");
     setError("");
+
+    if (!email) {
+      setError("Please enter your email");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await authService.forgotPassword(email);
+      const response = await authService.forgotPassword(email);
 
-      setSubmitted(true);
-    } catch (err) {
-      console.error("Forgot password failed:", err);
+      setMessage(
+        response?.message ||
+          "Password reset link sent to your email."
+      );
+
+      setEmail("");
+    } catch (error) {
+      console.error("Forgot password error:", error);
+
+      const data = error?.response?.data;
 
       setError(
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        "Something went wrong. Please try again."
+        data?.detail ||
+          data?.message ||
+          data?.email?.[0] ||
+          "Password reset failed."
       );
     } finally {
       setLoading(false);
@@ -32,93 +50,55 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
+    <div className="forgot-container">
+      <h1>PillSync</h1>
 
-        <div className="auth-brand">
-          <div className="auth-brand-icon">
-            <span>💊</span>
-          </div>
+      <h2>Forgot Password</h2>
 
-          <div>
-            <div className="auth-brand-name">
-              PillSync
-            </div>
+      <p>
+        Enter your registered email to reset your password
+      </p>
 
-            <div className="auth-brand-tagline">
-              Medication management made simple
-            </div>
-          </div>
-        </div>
+      <form onSubmit={handleReset}>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <h1 className="auth-title">
-          Forgot your password?
-        </h1>
+        <button type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send Reset Link"}
+        </button>
+      </form>
 
-        <p className="auth-subtitle">
-          Enter your email and we'll send you a
-          link to reset your password.
+      {message && (
+        <p className="success-message">
+          {message}
         </p>
+      )}
 
-        {error && (
-          <div className="auth-error" role="alert">
-            {error}
-          </div>
-        )}
-
-        {submitted ? (
-          <div className="auth-success">
-            <strong>Check your inbox</strong>
-
-            <br />
-
-            If an account exists for{" "}
-            <strong>{email}</strong>, a reset
-            link has been sent.
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="auth-form"
-          >
-            <label className="auth-label">
-              Email Address
-
-              <input
-                type="email"
-                value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
-                required
-                autoComplete="email"
-                placeholder="you@example.com"
-                disabled={loading}
-              />
-            </label>
-
-            <button
-              type="submit"
-              className="auth-btn"
-              disabled={loading}
-            >
-              {loading
-                ? "Sending..."
-                : "Send Reset Link"}
-            </button>
-          </form>
-        )}
-
-        <p className="auth-footer">
-          Remembered your password?{" "}
-          <Link to="/login">
-            Back to login
-          </Link>
+      {error && (
+        <p className="error-message">
+          {error}
         </p>
+      )}
 
-      </div>
+      <p>
+        Remember your password?{" "}
+        <span
+          className="back-login"
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </span>
+      </p>
     </div>
   );
-};
+}
 
 export default ForgotPassword;
+
+
+

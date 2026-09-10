@@ -1167,7 +1167,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 28px 28px 20px;
-  margin-bottom: 0; /* changed from 24px — grid gap handles spacing now */
+  margin-bottom: 0; /* changed from 24px - grid gap handles spacing now */
   box-shadow: var(--shadow-soft);
 }
 

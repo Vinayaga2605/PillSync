@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import reminderService from "../../services/reminderService";
 import medicationService from "../../services/medicationService";
 
@@ -98,7 +98,7 @@ const Reminders = () => {
     return (
       <div className="dashboard-loading">
         <div className="spinner" />
-        <p>Loading reminders…</p>
+        <p>Loading remindersâ€¦</p>
       </div>
     );
   }
@@ -123,7 +123,7 @@ const Reminders = () => {
             <div key={r.id} className={`reminder-card status-${r.status}`}>
               <div className="reminder-info" onClick={() => setSelectedReminder(r)} style={{ cursor: "pointer" }}>
                 <h4>{r.medicineName} {r.label && `(${r.label})`}</h4>
-                <p>{r.dosage} • {r.time} {r.date && `• ${r.date}`}</p>
+                <p>{r.dosage} â€¢ {r.time} {r.date && `â€¢ ${r.date}`}</p>
               </div>
               <div className="reminder-actions">
                 <button onClick={() => handleMark(r.id, "taken")}>Taken</button>
@@ -166,7 +166,7 @@ const Reminders = () => {
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowForm(false)} className="upload-btn secondary">Cancel</button>
                 <button type="submit" className="upload-btn primary" disabled={saving}>
-                  {saving ? "Saving…" : "Save"}
+                  {saving ? "Savingâ€¦" : "Save"}
                 </button>
               </div>
             </form>
@@ -180,7 +180,7 @@ const Reminders = () => {
             <h3>{selectedReminder.medicineName}</h3>
             <p className="detail-sub">Dosage: {selectedReminder.dosage}</p>
             <p className="detail-sub">Time: {selectedReminder.time}</p>
-            <p className="detail-sub">Label: {selectedReminder.label || "—"}</p>
+            <p className="detail-sub">Label: {selectedReminder.label || "â€”"}</p>
             <p className="detail-sub">Status: {selectedReminder.status}</p>
             <div className="modal-actions">
               <button className="upload-btn secondary" onClick={() => setSelectedReminder(null)}>Close</button>
@@ -193,3 +193,7 @@ const Reminders = () => {
 };
 
 export default Reminders;
+
+
+
+

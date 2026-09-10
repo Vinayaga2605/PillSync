@@ -1,17 +1,27 @@
-import React, {
+﻿import React, {
   useState,
   useEffect,
   useContext,
   useRef,
 } from "react";
 
-import { ThemeContext } from "../../context/ThemeContext";
-import notificationService from "../../services/notificationService";
+import {
+  Menu,
+  Sun,
+  Moon,
+  Bell,
+} from "lucide-react";
 
+import { ThemeContext } from "../../context/ThemeContext";
+import { AuthContext } from "../../context/AuthContext";
+import notificationService from "../../services/notificationService";
+import api from "../../services/api";
 
 const TopBar = ({ onMenuClick }) => {
   const { theme, toggleTheme } =
     useContext(ThemeContext);
+
+  const { user } = useContext(AuthContext);
 
   const [notifications, setNotifications] =
     useState([]);
@@ -21,19 +31,25 @@ const TopBar = ({ onMenuClick }) => {
   const panelRef = useRef(null);
 
   useEffect(() => {
-    notificationService
-      .getNotifications()
-      .then((res) => {
-        setNotifications(res.data || []);
-      })
-      .catch((err) => {
+    const loadNotifications = async () => {
+      try {
+        const data =
+          await notificationService.getNotifications();
+
+        setNotifications(
+          Array.isArray(data) ? data : []
+        );
+      } catch (err) {
         console.error(
           "Failed to load notifications:",
           err
         );
 
         setNotifications([]);
-      });
+      }
+    };
+
+    loadNotifications();
   }, []);
 
   useEffect(() => {
@@ -65,7 +81,9 @@ const TopBar = ({ onMenuClick }) => {
 
   const handleMarkAllRead = async () => {
     try {
-      await notificationService.markAllAsRead();
+      await api.patch(
+        "/notifications/mark-all-read/"
+      );
 
       setNotifications((prev) =>
         prev.map((notification) => ({
@@ -83,7 +101,9 @@ const TopBar = ({ onMenuClick }) => {
 
   const handleMarkOne = async (id) => {
     try {
-      await notificationService.markAsRead(id);
+      await notificationService.markNotificationAsRead(
+        id
+      );
 
       setNotifications((prev) =>
         prev.map((notification) =>
@@ -103,6 +123,15 @@ const TopBar = ({ onMenuClick }) => {
     }
   };
 
+  const initials = (
+    user?.username ||
+    user?.name ||
+    user?.email ||
+    "U"
+  )
+    .charAt(0)
+    .toUpperCase();
+
   return (
     <header className="top-bar">
       {/* Mobile menu */}
@@ -110,8 +139,10 @@ const TopBar = ({ onMenuClick }) => {
         className="menu-btn"
         onClick={onMenuClick}
         aria-label="Toggle menu"
+        title="Menu"
+        type="button"
       >
-        ☰
+        <Menu size={22} strokeWidth={2} />
       </button>
 
       <div className="top-bar-actions">
@@ -121,8 +152,13 @@ const TopBar = ({ onMenuClick }) => {
           onClick={toggleTheme}
           aria-label="Toggle dark mode"
           title="Toggle dark mode"
+          type="button"
         >
-          {theme === "light" ? "🌙" : "☀️"}
+          {theme === "light" ? (
+            <Moon size={20} strokeWidth={2} />
+          ) : (
+            <Sun size={20} strokeWidth={2} />
+          )}
         </button>
 
         {/* Notifications */}
@@ -131,18 +167,21 @@ const TopBar = ({ onMenuClick }) => {
           ref={panelRef}
         >
           <button
-            className="icon-btn"
+            className="icon-btn notification-btn"
             onClick={() =>
               setOpen((current) => !current)
             }
             aria-label="Notifications"
             title="Notifications"
+            type="button"
           >
-            🔔
+            <Bell size={20} strokeWidth={2} />
 
             {unreadCount > 0 && (
               <span className="notif-badge">
-                {unreadCount}
+                {unreadCount > 99
+                  ? "99+"
+                  : unreadCount}
               </span>
             )}
           </button>
@@ -150,12 +189,21 @@ const TopBar = ({ onMenuClick }) => {
           {open && (
             <div className="notification-panel">
               <div className="notification-panel-header">
-                <h4>Notifications</h4>
+                <div>
+                  <h4>Notifications</h4>
+
+                  {unreadCount > 0 && (
+                    <small>
+                      {unreadCount} unread
+                    </small>
+                  )}
+                </div>
 
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
                     className="mark-all-btn"
+                    type="button"
                   >
                     Mark all as read
                   </button>
@@ -164,9 +212,16 @@ const TopBar = ({ onMenuClick }) => {
 
               <div className="notification-list">
                 {notifications.length === 0 ? (
-                  <p className="notif-empty">
-                    No notifications yet.
-                  </p>
+                  <div className="notif-empty">
+                    <Bell
+                      size={22}
+                      strokeWidth={1.8}
+                    />
+
+                    <p>
+                      No notifications yet.
+                    </p>
+                  </div>
                 ) : (
                   notifications.map(
                     (notification) => (
@@ -182,20 +237,49 @@ const TopBar = ({ onMenuClick }) => {
                             notification.id
                           )
                         }
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Enter" ||
+                            e.key === " "
+                          ) {
+                            handleMarkOne(
+                              notification.id
+                            );
+                          }
+                        }}
                       >
-                        <p className="notif-title">
-                          {notification.title}
-                        </p>
+                        <div className="notification-item-icon">
+                          <Bell
+                            size={16}
+                            strokeWidth={2}
+                          />
+                        </div>
 
-                        <p className="notif-message">
-                          {notification.message}
-                        </p>
+                        <div className="notification-item-content">
+                          <p className="notif-title">
+                            {notification.title ||
+                              "Notification"}
+                          </p>
 
-                        <p className="notif-time">
-                          {new Date(
-                            notification.created_at
-                          ).toLocaleString()}
-                        </p>
+                          <p className="notif-message">
+                            {notification.message ||
+                              ""}
+                          </p>
+
+                          {notification.created_at && (
+                            <p className="notif-time">
+                              {new Date(
+                                notification.created_at
+                              ).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+
+                        {!notification.is_read && (
+                          <span className="unread-dot" />
+                        )}
                       </div>
                     )
                   )
@@ -203,6 +287,18 @@ const TopBar = ({ onMenuClick }) => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* User avatar */}
+        <div
+          className="topbar-user-avatar"
+          title={
+            user?.username ||
+            user?.name ||
+            "User"
+          }
+        >
+          {initials}
         </div>
       </div>
     </header>

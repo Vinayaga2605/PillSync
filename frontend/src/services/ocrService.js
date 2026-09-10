@@ -1,4 +1,4 @@
-import api from "./api";
+﻿import api from "./api";
 
 // Simulates OCR processing delay + extraction result.
 // Swap the body of scanPrescription() for a real api.post("/ocr/scan/", formData)
@@ -32,3 +32,6 @@ const ocrService = {
 };
 
 export default ocrService;
+
+
+
