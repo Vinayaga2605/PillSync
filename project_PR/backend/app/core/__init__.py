@@ -1,0 +1,1 @@
+# PillSync core configuration package

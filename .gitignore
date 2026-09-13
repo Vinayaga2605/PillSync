@@ -33,3 +33,5 @@ frontend/build/
 # OS files
 .DS_Store
 Thumbs.db
+project_PR/backend/.venv/
+project_PR/.env
