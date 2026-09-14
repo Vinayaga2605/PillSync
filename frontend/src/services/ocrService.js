@@ -1,37 +1,45 @@
 ﻿import api from "./api";
 
-// Simulates OCR processing delay + extraction result.
-// Swap the body of scanPrescription() for a real api.post("/ocr/scan/", formData)
-// once the backend OCR endpoint exists.
 const ocrService = {
   scanPrescription: async (file) => {
-    await new Promise((resolve) => setTimeout(resolve, 2200)); // simulate processing time
+    const formData = new FormData();
+    formData.append("prescription", file);
 
-    // Randomly simulate an occasional OCR failure for error-handling testing
-    if (Math.random() < 0.08) {
-      throw new Error("Could not read the prescription clearly. Please try a clearer photo.");
-    }
+    const response = await api.post("/ocr/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     return {
       data: {
-        rawText:
-          "Dr. R. Sharma, MD\nRx\nMetformin 500mg - Take twice daily\nAmlodipine 5mg - Take once daily, morning\nQty: 60 tablets each\nRefill: 2 times",
-        extractedMedicines: [
-          { name: "Metformin", dosage: "500mg", frequency: "Twice daily", quantity: 60 },
-          { name: "Amlodipine", dosage: "5mg", frequency: "Once daily", quantity: 60 },
-        ],
+        rawText: response.data.raw_text || "",
+        extractedMedicines: (response.data.medicines || []).map((medicine) => ({
+          name: medicine.name || "",
+          dosage: medicine.dosage || "",
+          frequency: medicine.frequency || "Once daily",
+          quantity: Number(medicine.quantity || 0),
+          doses_per_day: Number(medicine.doses_per_day || 1),
+        })),
       },
     };
   },
 
   saveMedicines: async (medicines) => {
-    // Once medications backend is live: return api.post("/medications/bulk-create/", { medicines });
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    return { data: { saved: medicines.length } };
+    const response = await api.post("/ocr/save/", {
+      medicines: medicines.map((medicine) => ({
+        name: medicine.name || "",
+        dosage: medicine.dosage || "",
+        frequency: medicine.frequency || "Once daily",
+        doses_per_day: Number(medicine.doses_per_day || 1),
+        quantity: Number(medicine.quantity || 0),
+      })),
+    });
+
+    return {
+      data: response.data,
+    };
   },
 };
 
 export default ocrService;
-
-
-

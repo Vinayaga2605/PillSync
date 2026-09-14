@@ -25,6 +25,13 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const updateUser = (updatedUser) => {
+    setUser((currentUser) => ({
+      ...currentUser,
+      ...updatedUser,
+    }));
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -35,6 +42,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         setUser,
+        updateUser,
         login,
         logout,
         loading,

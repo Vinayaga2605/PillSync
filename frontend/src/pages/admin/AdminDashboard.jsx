@@ -44,6 +44,7 @@ const AdminDashboard = () => {
       setStats(statsResponse.data || {});
 
       const usersData =
+        usersResponse.data?.users ||
         usersResponse.data?.results ||
         usersResponse.data ||
         [];
@@ -56,6 +57,7 @@ const AdminDashboard = () => {
 
       const notificationData =
         notificationResponse.data?.notifications ||
+        notificationResponse.data?.results ||
         notificationResponse.data ||
         [];
 
@@ -84,6 +86,7 @@ const AdminDashboard = () => {
   }, []);
 
   const unreadNotifications =
+    stats?.unreadNotifications ??
     notifications.filter(
       (item) => !item.is_read
     ).length;
@@ -97,6 +100,15 @@ const AdminDashboard = () => {
     ),
     100
   );
+
+  const systemStatus =
+    stats?.systemStatus || "Healthy";
+
+  const databaseConnected =
+    stats?.databaseConnected !== false;
+
+  const apiAvailable =
+    stats?.apiAvailable !== false;
 
   return (
     <div className="admin-dashboard-page">
@@ -120,9 +132,10 @@ const AdminDashboard = () => {
           className="admin-refresh-btn"
           onClick={loadDashboard}
           type="button"
+          disabled={loading}
         >
           <RefreshCw size={17} />
-          Refresh
+          {loading ? "Refreshing..." : "Refresh"}
         </button>
       </header>
 
@@ -166,9 +179,7 @@ const AdminDashboard = () => {
 
             <AdminStat
               icon={<Pill size={22} />}
-              value={
-                stats?.totalMedications ?? 0
-              }
+              value={stats?.totalMedications ?? 0}
               label="Medications"
               tone="orange"
             />
@@ -198,7 +209,7 @@ const AdminDashboard = () => {
 
             <AdminStat
               icon={<CheckCircle2 size={22} />}
-              value="Online"
+              value={systemStatus}
               label="System Status"
               tone="green"
             />
@@ -230,16 +241,24 @@ const AdminDashboard = () => {
                   icon={<Database size={19} />}
                   title="Database"
                   description="Django database connection"
-                  badge="Connected"
-                  success
+                  badge={
+                    databaseConnected
+                      ? "Connected"
+                      : "Unavailable"
+                  }
+                  success={databaseConnected}
                 />
 
                 <SystemRow
                   icon={<Globe size={19} />}
                   title="REST API"
                   description="Django REST Framework"
-                  badge="Available"
-                  success
+                  badge={
+                    apiAvailable
+                      ? "Available"
+                      : "Unavailable"
+                  }
+                  success={apiAvailable}
                 />
 
                 <SystemRow
@@ -318,6 +337,7 @@ const AdminDashboard = () => {
                       <div className="admin-user-avatar">
                         {(
                           user.username ||
+                          user.full_name ||
                           user.name ||
                           "U"
                         )
@@ -327,7 +347,8 @@ const AdminDashboard = () => {
 
                       <div className="admin-user-content">
                         <strong>
-                          {user.username ||
+                          {user.full_name ||
+                            user.username ||
                             user.name ||
                             "User"}
                         </strong>
@@ -641,6 +662,11 @@ const adminDashboardStyles = `
 
   .admin-refresh-btn:hover {
     background: #f9fafb;
+  }
+
+  .admin-refresh-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
   }
 
   .admin-error {

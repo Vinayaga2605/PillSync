@@ -10,6 +10,11 @@ export const markNotificationAsRead = async (id) => {
   return response.data;
 };
 
+export const markAllNotificationsAsRead = async () => {
+  const response = await api.patch("/notifications/mark-all-read/");
+  return response.data;
+};
+
 export const deleteNotification = async (id) => {
   const response = await api.delete(`/notifications/${id}/`);
   return response.data;
@@ -23,11 +28,9 @@ export const clearAllNotifications = async () => {
 const notificationService = {
   getNotifications,
   markNotificationAsRead,
+  markAllNotificationsAsRead,
   deleteNotification,
   clearAllNotifications,
 };
 
 export default notificationService;
-
-
-

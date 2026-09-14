@@ -1,5 +1,16 @@
 ﻿import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Upload,
+  Camera,
+  FileText,
+  Trash2,
+  Plus,
+  CheckCircle,
+  RotateCcw,
+  Loader2,
+  Home,
+} from "lucide-react";
 import ocrService from "../../services/ocrService";
 
 const STEPS = {
@@ -39,6 +50,7 @@ const MedicineUpload = () => {
       setError("Please select a valid image file (JPG, PNG).");
       return;
     }
+
     if (file.size > 10 * 1024 * 1024) {
       setError("Image is too large. Please choose a file under 10MB.");
       return;
@@ -57,16 +69,24 @@ const MedicineUpload = () => {
   const handleProcessImage = async () => {
     setStep(STEPS.PROCESSING);
     setError("");
+
     try {
       const res = await ocrService.scanPrescription(imageFile);
+
       setRawText(res.data.rawText);
       setMedicines(
-        res.data.extractedMedicines.map((m, i) => ({ ...m, id: i + 1 }))
+        res.data.extractedMedicines.map((m, i) => ({
+          ...m,
+          id: i + 1,
+        }))
       );
+
       setStep(STEPS.REVIEW);
     } catch (err) {
       console.error("OCR processing failed:", err);
-      setError(err.message || "Something went wrong while processing the image.");
+      setError(
+        err.message || "Something went wrong while processing the image."
+      );
       setStep(STEPS.PREVIEW);
     }
   };
@@ -84,7 +104,13 @@ const MedicineUpload = () => {
   const handleAddMedicine = () => {
     setMedicines((prev) => [
       ...prev,
-      { id: Date.now(), name: "", dosage: "", frequency: "", quantity: "" },
+      {
+        id: Date.now(),
+        name: "",
+        dosage: "",
+        frequency: "",
+        quantity: "",
+      },
     ]);
   };
 
@@ -92,16 +118,21 @@ const MedicineUpload = () => {
     setError("");
 
     const incomplete = medicines.some((m) => !m.name || !m.dosage);
+
     if (incomplete) {
-      setError("Please fill in at least the name and dosage for every medicine.");
+      setError(
+        "Please fill in at least the name and dosage for every medicine."
+      );
       return;
     }
+
     if (medicines.length === 0) {
       setError("Add at least one medicine before saving.");
       return;
     }
 
     setSaving(true);
+
     try {
       await ocrService.saveMedicines(medicines);
       setStep(STEPS.SAVED);
@@ -117,32 +148,44 @@ const MedicineUpload = () => {
     <div className="upload-page">
       <header className="dashboard-header">
         <h1>Upload Prescription</h1>
-        <p className="subtitle">Scan a prescription or medicine label to add it automatically</p>
+        <p className="subtitle">
+          Scan a prescription or medicine label to add it automatically
+        </p>
       </header>
 
       {error && step !== STEPS.PROCESSING && (
-        <div className="upload-error">{error}</div>
+        <div className="upload-error" role="alert">
+          {error}
+        </div>
       )}
 
       {/* Step 1: Select */}
       {step === STEPS.SELECT && (
         <div className="upload-dropzone">
-          <div className="upload-icon">??</div>
+          <div className="upload-icon">
+            <Upload />
+          </div>
+
           <h3>Add a prescription image</h3>
           <p>Take a photo or choose one from your device</p>
 
           <div className="upload-actions">
             <button
+              type="button"
               className="upload-btn primary"
               onClick={() => cameraInputRef.current?.click()}
             >
-              ?? Use Camera
+              <Camera />
+              <span>Use Camera</span>
             </button>
+
             <button
+              type="button"
               className="upload-btn secondary"
               onClick={() => fileInputRef.current?.click()}
             >
-              ?? Choose from Files
+              <FileText />
+              <span>Choose from Files</span>
             </button>
           </div>
 
@@ -154,6 +197,7 @@ const MedicineUpload = () => {
             onChange={handleFileInputChange}
             style={{ display: "none" }}
           />
+
           <input
             ref={fileInputRef}
             type="file"
@@ -168,13 +212,30 @@ const MedicineUpload = () => {
       {step === STEPS.PREVIEW && imagePreviewUrl && (
         <div className="upload-preview-card">
           <h3>Review your image</h3>
-          <img src={imagePreviewUrl} alt="Prescription preview" className="preview-image" />
+
+          <img
+            src={imagePreviewUrl}
+            alt="Prescription preview"
+            className="preview-image"
+          />
+
           <div className="upload-actions">
-            <button className="upload-btn secondary" onClick={resetAll}>
-              Retake / Choose Different
+            <button
+              type="button"
+              className="upload-btn secondary"
+              onClick={resetAll}
+            >
+              <RotateCcw />
+              <span>Choose Different Image</span>
             </button>
-            <button className="upload-btn primary" onClick={handleProcessImage}>
-              Process Image
+
+            <button
+              type="button"
+              className="upload-btn primary"
+              onClick={handleProcessImage}
+            >
+              <FileText />
+              <span>Process Image</span>
             </button>
           </div>
         </div>
@@ -183,8 +244,11 @@ const MedicineUpload = () => {
       {/* Step 3: Processing */}
       {step === STEPS.PROCESSING && (
         <div className="upload-processing">
-          <div className="spinner" />
-          <h3>Reading your prescriptionâ€¦</h3>
+          <div className="spinner">
+            <Loader2 />
+          </div>
+
+          <h3>Reading your prescription...</h3>
           <p>This usually takes a few seconds</p>
         </div>
       )}
@@ -195,7 +259,12 @@ const MedicineUpload = () => {
           <div className="review-columns">
             <div className="review-image-col">
               <h3>Original Image</h3>
-              <img src={imagePreviewUrl} alt="Prescription" className="preview-image" />
+
+              <img
+                src={imagePreviewUrl}
+                alt="Prescription"
+                className="preview-image"
+              />
             </div>
 
             <div className="review-text-col">
@@ -205,7 +274,10 @@ const MedicineUpload = () => {
           </div>
 
           <h3 className="section-title">Confirm Medicine Details</h3>
-          <p className="section-hint">Review and correct any details before saving.</p>
+
+          <p className="section-hint">
+            Review and correct any details before saving.
+          </p>
 
           <div className="medicine-edit-list">
             {medicines.map((med) => (
@@ -214,51 +286,103 @@ const MedicineUpload = () => {
                   type="text"
                   placeholder="Medicine name"
                   value={med.name}
-                  onChange={(e) => handleMedicineFieldChange(med.id, "name", e.target.value)}
+                  onChange={(e) =>
+                    handleMedicineFieldChange(
+                      med.id,
+                      "name",
+                      e.target.value
+                    )
+                  }
                 />
+
                 <input
                   type="text"
                   placeholder="Dosage (e.g. 500mg)"
                   value={med.dosage}
-                  onChange={(e) => handleMedicineFieldChange(med.id, "dosage", e.target.value)}
+                  onChange={(e) =>
+                    handleMedicineFieldChange(
+                      med.id,
+                      "dosage",
+                      e.target.value
+                    )
+                  }
                 />
+
                 <input
                   type="text"
                   placeholder="Frequency"
                   value={med.frequency}
-                  onChange={(e) => handleMedicineFieldChange(med.id, "frequency", e.target.value)}
+                  onChange={(e) =>
+                    handleMedicineFieldChange(
+                      med.id,
+                      "frequency",
+                      e.target.value
+                    )
+                  }
                 />
+
                 <input
                   type="number"
                   placeholder="Qty"
                   value={med.quantity}
-                  onChange={(e) => handleMedicineFieldChange(med.id, "quantity", e.target.value)}
+                  onChange={(e) =>
+                    handleMedicineFieldChange(
+                      med.id,
+                      "quantity",
+                      e.target.value
+                    )
+                  }
                 />
+
                 <button
+                  type="button"
                   className="remove-btn"
                   onClick={() => handleRemoveMedicine(med.id)}
-                  title="Remove"
+                  title="Remove medicine"
+                  aria-label="Remove medicine"
                 >
-                  ?
+                  <Trash2 />
                 </button>
               </div>
             ))}
           </div>
 
-          <button className="add-medicine-btn" onClick={handleAddMedicine}>
-            + Add another medicine
+          <button
+            type="button"
+            className="add-medicine-btn"
+            onClick={handleAddMedicine}
+          >
+            <Plus />
+            <span>Add another medicine</span>
           </button>
 
           <div className="upload-actions">
-            <button className="upload-btn secondary" onClick={resetAll}>
-              Start Over
-            </button>
             <button
+              type="button"
+              className="upload-btn secondary"
+              onClick={resetAll}
+            >
+              <RotateCcw />
+              <span>Start Over</span>
+            </button>
+
+            <button
+              type="button"
               className="upload-btn primary"
               onClick={handleConfirmSave}
               disabled={saving}
             >
-              {saving ? "Savingâ€¦" : "Confirm & Save"}
+              {saving ? (
+                <>
+                  <Loader2 className="spin" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle />
+                  <span>Confirm & Save</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -267,18 +391,34 @@ const MedicineUpload = () => {
       {/* Step 5: Saved */}
       {step === STEPS.SAVED && (
         <div className="upload-success">
-          <div className="success-icon">?</div>
+          <div className="success-icon">
+            <CheckCircle />
+          </div>
+
           <h3>Medicines saved successfully</h3>
-          <p>{medicines.length} medicine{medicines.length !== 1 ? "s" : ""} added to your list.</p>
+
+          <p>
+            {medicines.length} medicine
+            {medicines.length !== 1 ? "s" : ""} added to your list.
+          </p>
+
           <div className="upload-actions">
-            <button className="upload-btn secondary" onClick={resetAll}>
-              Upload Another
-            </button>
             <button
+              type="button"
+              className="upload-btn secondary"
+              onClick={resetAll}
+            >
+              <Upload />
+              <span>Upload Another</span>
+            </button>
+
+            <button
+              type="button"
               className="upload-btn primary"
               onClick={() => navigate("/patient-dashboard")}
             >
-              Go to Dashboard
+              <Home />
+              <span>Go to Dashboard</span>
             </button>
           </div>
         </div>
@@ -288,7 +428,3 @@ const MedicineUpload = () => {
 };
 
 export default MedicineUpload;
-
-
-
-

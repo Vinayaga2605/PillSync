@@ -9,6 +9,9 @@ import {
   TrendingUp,
   Package,
   RefreshCw,
+  UserRound,
+  Clock3,
+  CircleAlert,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import caregiverService from "../../services/caregiverService";
@@ -111,12 +114,11 @@ const CaregiverDashboard = () => {
     <div className="caregiver-page">
       <style>{caregiverStyles}</style>
 
-      {/* HEADER */}
       <div className="caregiver-header">
         <div>
           <div className="caregiver-kicker">
             <Activity size={15} />
-            CAREGIVER MONITORING
+            <span>Caregiver Monitoring</span>
           </div>
 
           <h1>Caregiver Dashboard</h1>
@@ -129,43 +131,47 @@ const CaregiverDashboard = () => {
 
         <div className="cg-header-actions">
           <button
+            type="button"
             className="cg-refresh-btn"
             onClick={fetchDashboard}
             disabled={loading}
           >
             <RefreshCw
               size={15}
-              className={
-                loading ? "cg-spin" : ""
-              }
+              className={loading ? "cg-spin" : ""}
             />
-            Refresh
+            <span>Refresh</span>
           </button>
 
           <button
+            type="button"
             className="cg-primary-btn"
             onClick={() =>
               navigate("/caregiver-patients")
             }
           >
             <Users size={17} />
-            View Patients
+            <span>View Patients</span>
           </button>
         </div>
       </div>
 
-      {/* ERROR */}
       {error && (
-        <div className="cg-error">
+        <div className="cg-error" role="alert">
+          <AlertTriangle size={16} />
+
           <span>{error}</span>
 
-          <button onClick={fetchDashboard}>
-            Try Again
+          <button
+            type="button"
+            onClick={fetchDashboard}
+          >
+            <RefreshCw size={14} />
+            <span>Try Again</span>
           </button>
         </div>
       )}
 
-      {/* LOADING */}
       {loading ? (
         <div className="cg-loading">
           <RefreshCw
@@ -176,7 +182,6 @@ const CaregiverDashboard = () => {
         </div>
       ) : (
         <>
-          {/* STATS */}
           <div className="cg-stat-grid">
             <StatCard
               icon={<Users size={21} />}
@@ -211,9 +216,7 @@ const CaregiverDashboard = () => {
             />
           </div>
 
-          {/* MAIN GRID */}
           <div className="cg-main-grid">
-            {/* PATIENT ADHERENCE */}
             <section className="cg-card">
               <div className="cg-card-header">
                 <div className="cg-title">
@@ -223,19 +226,18 @@ const CaregiverDashboard = () => {
 
                   <div>
                     <h2>Patient Adherence</h2>
-                    <p>
-                      Current medication performance
-                    </p>
+                    <p>Current medication performance</p>
                   </div>
                 </div>
 
                 <button
+                  type="button"
                   className="cg-link-btn"
                   onClick={() =>
                     navigate("/caregiver-patients")
                   }
                 >
-                  View all
+                  <span>View all</span>
                   <ArrowRight size={15} />
                 </button>
               </div>
@@ -262,7 +264,7 @@ const CaregiverDashboard = () => {
                       const age =
                         patient.age ??
                         patient.patient_age ??
-                        "-";
+                        null;
 
                       const medicines = Number(
                         patient.medicines ??
@@ -314,22 +316,31 @@ const CaregiverDashboard = () => {
                             <div>
                               <strong>{name}</strong>
 
-                              <span>
-                                {age !== "-"
-                                  ? `${age} years`
-                                  : "Age unavailable"}
-                                {" • "}
-                                {medicines}{" "}
-                                {medicines === 1
-                                  ? "medicine"
-                                  : "medicines"}
-                              </span>
+                              <div className="patient-meta">
+                                <span>
+                                  <UserRound size={10} />
+                                  {age !== null
+                                    ? `${age} years`
+                                    : "Age unavailable"}
+                                </span>
+
+                                <span className="patient-meta-separator" />
+
+                                <span>
+                                  <Pill size={10} />
+                                  {medicines}{" "}
+                                  {medicines === 1
+                                    ? "medicine"
+                                    : "medicines"}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
                           <div className="patient-progress-area">
                             <div className="patient-progress-label">
                               <span>Adherence</span>
+
                               <strong>
                                 {adherence}%
                               </strong>
@@ -362,7 +373,23 @@ const CaregiverDashboard = () => {
                               status
                             ).toLowerCase()}`}
                           >
-                            {status}
+                            {String(status).toLowerCase() === "good" ? (
+                              <>
+                                <CheckCircle2 size={12} />
+                                <span>Good</span>
+                              </>
+                            ) : String(status).toLowerCase() ===
+                              "attention" ? (
+                              <>
+                                <CircleAlert size={12} />
+                                <span>Attention</span>
+                              </>
+                            ) : (
+                              <>
+                                <AlertTriangle size={12} />
+                                <span>Critical</span>
+                              </>
+                            )}
                           </span>
                         </div>
                       );
@@ -371,7 +398,6 @@ const CaregiverDashboard = () => {
               </div>
             </section>
 
-            {/* ALERTS */}
             <section className="cg-card">
               <div className="cg-card-header">
                 <div className="cg-title">
@@ -381,19 +407,18 @@ const CaregiverDashboard = () => {
 
                   <div>
                     <h2>Today's Alerts</h2>
-                    <p>
-                      Important patient updates
-                    </p>
+                    <p>Important patient updates</p>
                   </div>
                 </div>
 
                 <button
+                  type="button"
                   className="cg-link-btn"
                   onClick={() =>
                     navigate("/caregiver-alerts")
                   }
                 >
-                  See all
+                  <span>See all</span>
                   <ArrowRight size={15} />
                 </button>
               </div>
@@ -459,10 +484,12 @@ const CaregiverDashboard = () => {
 
                           <div className="alert-content">
                             <strong>{title}</strong>
-
                             <p>{message}</p>
 
-                            <span>{time}</span>
+                            <span className="alert-time">
+                              <Clock3 size={10} />
+                              {time}
+                            </span>
                           </div>
                         </div>
                       );
@@ -472,7 +499,6 @@ const CaregiverDashboard = () => {
             </section>
           </div>
 
-          {/* QUICK ACTIONS */}
           <section className="cg-card">
             <div className="cg-card-header">
               <div className="cg-title">
@@ -488,81 +514,73 @@ const CaregiverDashboard = () => {
             </div>
 
             <div className="quick-action-grid">
-              <button
+              <QuickAction
+                icon={<Users size={21} />}
+                title="My Patients"
+                description="View assigned patients"
                 onClick={() =>
                   navigate("/caregiver-patients")
                 }
-              >
-                <Users size={21} />
+              />
 
-                <span>
-                  <strong>My Patients</strong>
-                  <small>
-                    View assigned patients
-                  </small>
-                </span>
-              </button>
-
-              <button
+              <QuickAction
+                icon={<Pill size={21} />}
+                title="Medication Monitoring"
+                description="Track medications and doses"
                 onClick={() =>
                   navigate(
                     "/caregiver-medication-monitoring"
                   )
                 }
-              >
-                <Pill size={21} />
+              />
 
-                <span>
-                  <strong>
-                    Medication Monitoring
-                  </strong>
-
-                  <small>
-                    Track medications and doses
-                  </small>
-                </span>
-              </button>
-
-              <button
+              <QuickAction
+                icon={<TrendingUp size={21} />}
+                title="Patient Analytics"
+                description="View adherence insights"
                 onClick={() =>
                   navigate(
                     "/caregiver-patient-analytics"
                   )
                 }
-              >
-                <TrendingUp size={21} />
+              />
 
-                <span>
-                  <strong>
-                    Patient Analytics
-                  </strong>
-
-                  <small>
-                    View adherence insights
-                  </small>
-                </span>
-              </button>
-
-              <button
+              <QuickAction
+                icon={<AlertTriangle size={21} />}
+                title="Alerts"
+                description="Review important alerts"
                 onClick={() =>
                   navigate("/caregiver-alerts")
                 }
-              >
-                <AlertTriangle size={21} />
-
-                <span>
-                  <strong>Alerts</strong>
-
-                  <small>
-                    Review important alerts
-                  </small>
-                </span>
-              </button>
+              />
             </div>
           </section>
         </>
       )}
     </div>
+  );
+};
+
+const QuickAction = ({
+  icon,
+  title,
+  description,
+  onClick,
+}) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+    >
+      {icon}
+
+      <span>
+        <strong>{title}</strong>
+        <small>{description}</small>
+      </span>
+
+      <ArrowRight size={15} />
+    </button>
   );
 };
 
@@ -733,18 +751,24 @@ const caregiverStyles = `
   gap: 8px;
 }
 
-.cg-refresh-btn {
+.cg-refresh-btn,
+.cg-primary-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
-  border: 1px solid #dfe8e5;
   border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: .2s ease;
+}
+
+.cg-refresh-btn {
+  border: 1px solid #dfe8e5;
   padding: 10px 13px;
   background: white;
   color: #2f8f7f;
-  cursor: pointer;
   font-size: 10px;
-  font-weight: 700;
 }
 
 .cg-refresh-btn:hover {
@@ -757,16 +781,11 @@ const caregiverStyles = `
 }
 
 .cg-primary-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   border: 0;
-  border-radius: 11px;
   padding: 11px 16px;
   background: #2f8f7f;
   color: white;
-  cursor: pointer;
-  font-weight: 650;
+  font-size: 12px;
   box-shadow: 0 5px 16px rgba(47,143,127,.16);
 }
 
@@ -777,8 +796,7 @@ const caregiverStyles = `
 .cg-error {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 9px;
   margin-bottom: 18px;
   padding: 12px 14px;
   border: 1px solid #f1d3d0;
@@ -788,12 +806,19 @@ const caregiverStyles = `
   font-size: 12px;
 }
 
+.cg-error > span {
+  flex: 1;
+}
+
 .cg-error button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 0;
   border-radius: 7px;
   padding: 7px 10px;
   background: #b14d45;
-  color: white;
+  color: #fff;
   cursor: pointer;
   font-size: 10px;
   font-weight: 700;
@@ -963,7 +988,7 @@ const caregiverStyles = `
 }
 
 .cg-link-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
   border: 0;
@@ -996,6 +1021,7 @@ const caregiverStyles = `
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .patient-avatar {
@@ -1012,17 +1038,37 @@ const caregiverStyles = `
   flex-shrink: 0;
 }
 
+.patient-main > div:last-child {
+  min-width: 0;
+}
+
 .patient-main strong {
   display: block;
   color: #31463f;
   font-size: 12px;
 }
 
-.patient-main span {
-  display: block;
+.patient-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 3px;
   color: #8a9692;
   font-size: 10px;
-  margin-top: 2px;
+}
+
+.patient-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.patient-meta-separator {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #a6b0ac;
 }
 
 .patient-progress-label {
@@ -1060,6 +1106,9 @@ const caregiverStyles = `
 }
 
 .cg-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 5px 9px;
   border-radius: 8px;
   font-size: 9px;
@@ -1141,7 +1190,10 @@ const caregiverStyles = `
   line-height: 1.45;
 }
 
-.alert-content span {
+.alert-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: #a1aaa6;
   font-size: 9px;
 }
@@ -1174,7 +1226,8 @@ const caregiverStyles = `
 }
 
 .quick-action-grid button {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 11px;
   border: 1px solid #e6eeeb;
@@ -1192,9 +1245,13 @@ const caregiverStyles = `
   transform: translateY(-1px);
 }
 
-.quick-action-grid button > svg {
+.quick-action-grid button > svg:first-child {
   color: #2f8f7f;
   flex-shrink: 0;
+}
+
+.quick-action-grid button > svg:last-child {
+  color: #98a6a1;
 }
 
 .quick-action-grid strong {
@@ -1240,7 +1297,6 @@ const caregiverStyles = `
   .cg-primary-btn,
   .cg-refresh-btn {
     flex: 1;
-    justify-content: center;
   }
 
   .cg-stat-grid {

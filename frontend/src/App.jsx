@@ -41,6 +41,9 @@ import AdminUserManagement from "./pages/admin/AdminUserManagement";
 
 import Notifications from "./pages/notifications/Notifications";
 
+import Profile from "./pages/account/Profile";
+import Settings from "./pages/account/Settings";
+
 import AppLayout from "./components/common/AppLayout";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
@@ -48,7 +51,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* ================= PUBLIC ================= */}
 
         <Route
@@ -79,7 +81,6 @@ function App() {
         {/* ================= PROTECTED APP ================= */}
 
         <Route element={<AppLayout />}>
-
           {/* ================= PATIENT ================= */}
 
           <Route
@@ -310,6 +311,39 @@ function App() {
             }
           />
 
+          {/* ================= COMMON PROFILE ================= */}
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute
+                allowedRoles={[
+                  "patient",
+                  "caregiver",
+                  "admin",
+                ]}
+              >
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ================= COMMON SETTINGS ================= */}
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute
+                allowedRoles={[
+                  "patient",
+                  "caregiver",
+                  "admin",
+                ]}
+              >
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* ================= FALLBACK ================= */}
@@ -318,7 +352,6 @@ function App() {
           path="*"
           element={<Navigate to="/login" replace />}
         />
-
       </Routes>
     </BrowserRouter>
   );

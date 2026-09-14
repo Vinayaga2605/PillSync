@@ -20,6 +20,7 @@ urlpatterns = [
     path("api/adherence/", include("apps.adherence.urls")),
     path("api/refill/", include("apps.refill_engine.urls")),
     path("api/admin/", include("apps.users.admin_urls")),
+    path("api/ocr/", include("apps.ocr.urls")),
 
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),

@@ -57,7 +57,11 @@ def _patient_dose_stats(patient):
         status=DoseLog.Status.PENDING
     ).count()
 
-    adherence = round((taken / total) * 100) if total else 0
+    adherence = (
+        round((taken / total) * 100)
+        if total
+        else 0
+    )
 
     return {
         "total": total,
@@ -519,14 +523,18 @@ class CaregiverPatientAnalyticsView(APIView):
 
         stats = _patient_dose_stats(patient)
 
-        # Last 7 days adherence
+        # ----------------------------------------------------
+        # LAST 7 DAYS ADHERENCE
+        # ----------------------------------------------------
+
         start_date = date.today() - timedelta(days=6)
 
         trend = []
 
         for offset in range(7):
-            current_date = start_date + timedelta(
-                days=offset
+            current_date = (
+                start_date
+                + timedelta(days=offset)
             )
 
             logs = DoseLog.objects.filter(
@@ -540,6 +548,14 @@ class CaregiverPatientAnalyticsView(APIView):
                 status=DoseLog.Status.TAKEN
             ).count()
 
+            missed = logs.filter(
+                status=DoseLog.Status.MISSED
+            ).count()
+
+            pending = logs.filter(
+                status=DoseLog.Status.PENDING
+            ).count()
+
             adherence = (
                 round((taken / total) * 100)
                 if total
@@ -547,17 +563,29 @@ class CaregiverPatientAnalyticsView(APIView):
             )
 
             trend.append({
-                "date": current_date.strftime("%Y-%m-%d"),
-                "day": current_date.strftime("%a"),
+                "date": current_date.strftime(
+                    "%Y-%m-%d"
+                ),
+                "day": current_date.strftime(
+                    "%a"
+                ),
+                "label": current_date.strftime(
+                    "%a"
+                ),
                 "adherence": adherence,
                 "taken": taken,
+                "missed": missed,
+                "pending": pending,
                 "total": total,
             })
 
-        # Medicine-level adherence
+        # ----------------------------------------------------
+        # MEDICINE-LEVEL ANALYTICS
+        # ----------------------------------------------------
+
         medications = Medication.objects.filter(
             patient=patient
-        )
+        ).order_by("name")
 
         medicine_data = []
 
@@ -572,36 +600,92 @@ class CaregiverPatientAnalyticsView(APIView):
                 status=DoseLog.Status.TAKEN
             ).count()
 
+            missed = logs.filter(
+                status=DoseLog.Status.MISSED
+            ).count()
+
+            pending = logs.filter(
+                status=DoseLog.Status.PENDING
+            ).count()
+
             adherence = (
                 round((taken / total) * 100)
                 if total
                 else 0
             )
 
+            daily_requirement = (
+                medication.doses_per_day or 1
+            )
+
+            remaining_stock = (
+                medication.remaining_stock or 0
+            )
+
+            days_remaining = (
+                round(
+                    remaining_stock
+                    / daily_requirement
+                )
+                if daily_requirement > 0
+                else 0
+            )
+
+            if days_remaining <= 2:
+                stock_status = "Critical"
+            elif days_remaining <= 5:
+                stock_status = "Low Stock"
+            else:
+                stock_status = "Good"
+
             medicine_data.append({
+                "id": medication.id,
                 "medicine": medication.name,
+                "medicineName": medication.name,
+                "name": medication.name,
                 "adherence": adherence,
+                "adherencePercentage": adherence,
                 "taken": taken,
+                "dosesTaken": taken,
+                "missed": missed,
+                "dosesMissed": missed,
+                "pending": pending,
+                "dosesPending": pending,
                 "total": total,
-                "remainingStock": medication.remaining_stock,
+                "totalDoses": total,
+                "remainingStock": remaining_stock,
+                "stock": remaining_stock,
                 "totalStock": medication.total_stock,
+                "dailyRequirement": daily_requirement,
+                "daysRemaining": days_remaining,
+                "stockDays": days_remaining,
+                "refillDays": days_remaining,
+                "status": stock_status,
             })
+
+        # ----------------------------------------------------
+        # REFILL STATUS
+        # ----------------------------------------------------
 
         refill_data = []
 
         for medication in medications:
             daily_requirement = (
-                medication.doses_per_day
-                or 0
+                medication.doses_per_day or 1
             )
 
-            if daily_requirement > 0:
-                days_remaining = round(
-                    medication.remaining_stock
+            remaining_stock = (
+                medication.remaining_stock or 0
+            )
+
+            days_remaining = (
+                round(
+                    remaining_stock
                     / daily_requirement
                 )
-            else:
-                days_remaining = 0
+                if daily_requirement > 0
+                else 0
+            )
 
             if days_remaining <= 2:
                 status = "critical"
@@ -611,14 +695,24 @@ class CaregiverPatientAnalyticsView(APIView):
                 status = "good"
 
             refill_data.append({
+                "id": medication.id,
                 "medicationId": medication.id,
+                "medicine": medication.name,
                 "medicineName": medication.name,
+                "name": medication.name,
                 "dosage": medication.dosage,
-                "remainingStock": medication.remaining_stock,
+                "remainingStock": remaining_stock,
+                "totalStock": medication.total_stock,
                 "dailyRequirement": daily_requirement,
                 "daysRemaining": days_remaining,
+                "stockDays": days_remaining,
+                "refillDays": days_remaining,
                 "status": status,
             })
+
+        # ----------------------------------------------------
+        # RESPONSE
+        # ----------------------------------------------------
 
         return Response({
             "patient": {
@@ -627,6 +721,8 @@ class CaregiverPatientAnalyticsView(APIView):
                 "age": _patient_age(patient),
                 "condition": _patient_conditions(patient),
             },
+
+            # Existing summary kept unchanged
             "summary": {
                 "adherence": stats["adherence"],
                 "taken": stats["taken"],
@@ -634,9 +730,39 @@ class CaregiverPatientAnalyticsView(APIView):
                 "pending": stats["pending"],
                 "totalDoses": stats["total"],
             },
+
+            # Added aliases expected by caregiver frontend
+            "statistics": {
+                "adherence": stats["adherence"],
+                "taken": stats["taken"],
+                "missed": stats["missed"],
+                "pending": stats["pending"],
+                "dosesTaken": stats["taken"],
+                "dosesMissed": stats["missed"],
+                "dosesPending": stats["pending"],
+                "totalDoses": stats["total"],
+            },
+
+            "adherence": stats["adherence"],
+            "adherencePercentage": stats["adherence"],
+            "taken": stats["taken"],
+            "dosesTaken": stats["taken"],
+            "missed": stats["missed"],
+            "dosesMissed": stats["missed"],
+            "pending": stats["pending"],
+            "dosesPending": stats["pending"],
+
             "weeklyAdherence": trend,
+            "weekly_adherence": trend,
+
             "medicinePerformance": medicine_data,
+            "medicine_performance": medicine_data,
+            "medicationSummary": medicine_data,
+            "medication_summary": medicine_data,
+            "medications": medicine_data,
+
             "refillStatus": refill_data,
+            "refill_status": refill_data,
         })
 
 

@@ -1,4 +1,21 @@
 ﻿import React, { useState, useEffect } from "react";
+import {
+  Activity,
+  BarChart3,
+  CheckCircle,
+  ChevronRight,
+  FileBarChart,
+  LayoutDashboard,
+  Mail,
+  RefreshCw,
+  RotateCcw,
+  ShieldCheck,
+  Users,
+  UserCheck,
+  UserCog,
+  UserX,
+  AlertCircle,
+} from "lucide-react";
 import adminService from "../../services/adminService";
 
 const AdminPanel = () => {
@@ -77,10 +94,33 @@ const AdminPanel = () => {
     return "Critical";
   };
 
+  const tabs = [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      id: "users",
+      label: "Users",
+      icon: Users,
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: FileBarChart,
+    },
+    {
+      id: "system",
+      label: "System Analytics",
+      icon: BarChart3,
+    },
+  ];
+
   if (loading) {
     return (
       <div className="dashboard-loading">
-        <div className="spinner" />
+        <RefreshCw className="spinner" size={22} />
         <p>Loading admin panel...</p>
       </div>
     );
@@ -89,8 +129,13 @@ const AdminPanel = () => {
   if (error && !stats) {
     return (
       <div className="dashboard-error">
+        <AlertCircle size={24} />
         <p>{error}</p>
-        <button onClick={fetchAll}>Retry</button>
+
+        <button type="button" onClick={fetchAll}>
+          <RotateCcw size={16} />
+          <span>Retry</span>
+        </button>
       </div>
     );
   }
@@ -106,49 +151,44 @@ const AdminPanel = () => {
         </div>
 
         <button
+          type="button"
           className="btn-primary"
           onClick={handleRefresh}
           disabled={refreshing}
         >
-          {refreshing ? "Refreshing..." : "Refresh"}
+          <RefreshCw
+            size={16}
+            className={refreshing ? "spin" : ""}
+          />
+          <span>{refreshing ? "Refreshing..." : "Refresh"}</span>
         </button>
       </header>
 
       {error && (
-        <div className="upload-error">
-          {error}
+        <div className="upload-error" role="alert">
+          <AlertCircle size={16} />
+          <span>{error}</span>
         </div>
       )}
 
       <section className="report-section">
         <div className="report-toggle">
-          <button
-            className={activeTab === "dashboard" ? "active" : ""}
-            onClick={() => setActiveTab("dashboard")}
-          >
-            Dashboard
-          </button>
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
 
-          <button
-            className={activeTab === "users" ? "active" : ""}
-            onClick={() => setActiveTab("users")}
-          >
-            Users
-          </button>
-
-          <button
-            className={activeTab === "reports" ? "active" : ""}
-            onClick={() => setActiveTab("reports")}
-          >
-            Reports
-          </button>
-
-          <button
-            className={activeTab === "system" ? "active" : ""}
-            onClick={() => setActiveTab("system")}
-          >
-            System Analytics
-          </button>
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                className={isActive ? "active" : ""}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <Icon size={16} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -207,6 +247,7 @@ const AdminPanel = () => {
             <div className="stat-cards">
               <div className="stat-card">
                 <p className="stat-card-label">Patients / Users</p>
+
                 <h3 className="stat-card-value">
                   {stats.totalUsers
                     ? Math.round(
@@ -215,6 +256,7 @@ const AdminPanel = () => {
                     : 0}
                   %
                 </h3>
+
                 <p className="stat-card-helper">
                   Share of registered users
                 </p>
@@ -222,6 +264,7 @@ const AdminPanel = () => {
 
               <div className="stat-card">
                 <p className="stat-card-label">Caregivers / Users</p>
+
                 <h3 className="stat-card-value">
                   {stats.totalUsers
                     ? Math.round(
@@ -230,6 +273,7 @@ const AdminPanel = () => {
                     : 0}
                   %
                 </h3>
+
                 <p className="stat-card-helper">
                   Caregiver account share
                 </p>
@@ -237,6 +281,7 @@ const AdminPanel = () => {
 
               <div className="stat-card">
                 <p className="stat-card-label">Medication Coverage</p>
+
                 <h3 className="stat-card-value">
                   {stats.totalPatients > 0
                     ? Math.round(
@@ -244,6 +289,7 @@ const AdminPanel = () => {
                       )
                     : 0}
                 </h3>
+
                 <p className="stat-card-helper">
                   Avg. medicines per patient
                 </p>
@@ -259,18 +305,23 @@ const AdminPanel = () => {
           <div className="section-header-row">
             <div>
               <h2>All Users</h2>
+
               <p className="subtitle">
                 Manage registered users and account status.
               </p>
             </div>
 
             <span className="badge badge--accent">
+              <Users size={14} />
               {users.length} users
             </span>
           </div>
 
           {users.length === 0 ? (
-            <p className="empty-state">No users found.</p>
+            <div className="empty-state">
+              <Users size={20} />
+              <span>No users found.</span>
+            </div>
           ) : (
             <div className="table-responsive">
               <table className="refill-table">
@@ -292,7 +343,18 @@ const AdminPanel = () => {
                         <strong>{user.username}</strong>
                       </td>
 
-                      <td>{user.email || "-"}</td>
+                      <td>
+                        {user.email ? (
+                          <span className="admin-email-cell">
+                            <Mail size={14} />
+                            {user.email}
+                          </span>
+                        ) : (
+                          <span className="admin-muted-cell">
+                            Not provided
+                          </span>
+                        )}
+                      </td>
 
                       <td style={{ textTransform: "capitalize" }}>
                         {user.role}
@@ -308,15 +370,39 @@ const AdminPanel = () => {
                               : "badge--danger"
                           }`}
                         >
-                          {user.isActive ? "Active" : "Deactivated"}
+                          {user.isActive ? (
+                            <>
+                              <UserCheck size={13} />
+                              Active
+                            </>
+                          ) : (
+                            <>
+                              <UserX size={13} />
+                              Deactivated
+                            </>
+                          )}
                         </span>
                       </td>
 
                       <td>
                         <button
+                          type="button"
+                          className="admin-user-action"
                           onClick={() => handleToggleActive(user.id)}
                         >
-                          {user.isActive ? "Deactivate" : "Activate"}
+                          {user.isActive ? (
+                            <>
+                              <UserX size={15} />
+                              <span>Deactivate</span>
+                            </>
+                          ) : (
+                            <>
+                              <UserCheck size={15} />
+                              <span>Activate</span>
+                            </>
+                          )}
+
+                          <ChevronRight size={14} />
                         </button>
                       </td>
                     </tr>
@@ -336,16 +422,12 @@ const AdminPanel = () => {
           <div className="stat-cards">
             <div className="stat-card">
               <p className="stat-card-label">Total Users</p>
-              <h3 className="stat-card-value">
-                {stats.totalUsers}
-              </h3>
+              <h3 className="stat-card-value">{stats.totalUsers}</h3>
             </div>
 
             <div className="stat-card">
               <p className="stat-card-label">Patients</p>
-              <h3 className="stat-card-value">
-                {stats.totalPatients}
-              </h3>
+              <h3 className="stat-card-value">{stats.totalPatients}</h3>
             </div>
 
             <div className="stat-card">
@@ -393,6 +475,7 @@ const AdminPanel = () => {
               <p className="stat-card-label">
                 Total Medications Tracked
               </p>
+
               <h3 className="stat-card-value">
                 {stats.totalMedications}
               </h3>
@@ -402,24 +485,23 @@ const AdminPanel = () => {
               <p className="stat-card-label">
                 System Adherence Rate
               </p>
+
               <h3 className="stat-card-value">
                 {stats.overallAdherence}%
               </h3>
             </div>
 
             <div className="stat-card tone-purple">
-              <p className="stat-card-label">
-                Patients
-              </p>
+              <p className="stat-card-label">Patients</p>
+
               <h3 className="stat-card-value">
                 {stats.totalPatients}
               </h3>
             </div>
 
             <div className="stat-card tone-blue">
-              <p className="stat-card-label">
-                Caregivers
-              </p>
+              <p className="stat-card-label">Caregivers</p>
+
               <h3 className="stat-card-value">
                 {stats.totalCaregivers}
               </h3>
@@ -435,12 +517,14 @@ const AdminPanel = () => {
                   <p className="list-item__name">
                     User Management
                   </p>
+
                   <p className="list-item__desc">
                     {stats.totalUsers} registered accounts
                   </p>
                 </div>
 
                 <span className="badge badge--success">
+                  <CheckCircle size={13} />
                   Operational
                 </span>
               </div>
@@ -450,12 +534,14 @@ const AdminPanel = () => {
                   <p className="list-item__name">
                     Medication Tracking
                   </p>
+
                   <p className="list-item__desc">
                     {stats.totalMedications} medicines tracked
                   </p>
                 </div>
 
                 <span className="badge badge--success">
+                  <CheckCircle size={13} />
                   Operational
                 </span>
               </div>
@@ -465,12 +551,14 @@ const AdminPanel = () => {
                   <p className="list-item__name">
                     Adherence Monitoring
                   </p>
+
                   <p className="list-item__desc">
                     {stats.overallAdherence}% overall adherence
                   </p>
                 </div>
 
                 <span className="badge badge--success">
+                  <Activity size={13} />
                   Monitoring
                 </span>
               </div>
@@ -483,6 +571,3 @@ const AdminPanel = () => {
 };
 
 export default AdminPanel;
-
-
-

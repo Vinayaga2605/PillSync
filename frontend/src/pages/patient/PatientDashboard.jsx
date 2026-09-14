@@ -14,6 +14,9 @@ import {
   RefreshCw,
   AlertTriangle,
   ArrowRight,
+  CircleSlash2,
+  AlarmClock,
+  CalendarDays,
 } from "lucide-react";
 
 import { AuthContext } from "../../context/AuthContext";
@@ -49,12 +52,12 @@ const getMedicineName = (item) =>
 const getDosage = (item) =>
   item?.dosage ||
   item?.medication?.dosage ||
-  "-";
+  "Dosage not specified";
 
 const getTime = (item) =>
   item?.time ||
   item?.time_label ||
-  "--:--";
+  "Time not specified";
 
 const getStatus = (item) =>
   String(item?.status || "pending").toLowerCase();
@@ -79,8 +82,7 @@ const PatientDashboard = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] =
-    useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("today");
 
@@ -232,7 +234,10 @@ const PatientDashboard = () => {
         <style>{dashboardStyles}</style>
 
         <div className="dashboard-state">
-          <div className="loading-spinner" />
+          <div className="loading-spinner">
+            <RefreshCw size={21} />
+          </div>
+
           <p>Loading your dashboard...</p>
         </div>
       </div>
@@ -256,33 +261,38 @@ const PatientDashboard = () => {
           </h1>
 
           <p className="dashboard-subtitle">
-            Here is your medication overview for
-            today.
+            Here is your medication overview for today.
           </p>
         </div>
 
         <button
+          type="button"
           className="header-action"
           onClick={() =>
             navigate("/notifications")
           }
         >
           <Bell size={18} />
-          Notifications
+          <span>Notifications</span>
         </button>
       </header>
 
       {/* ERROR */}
 
       {error && (
-        <div className="dashboard-error">
+        <div
+          className="dashboard-error"
+          role="alert"
+        >
           <AlertTriangle size={18} />
           <span>{error}</span>
 
           <button
+            type="button"
             onClick={fetchDashboardData}
           >
-            Retry
+            <RefreshCw size={15} />
+            <span>Retry</span>
           </button>
         </div>
       )}
@@ -348,9 +358,7 @@ const PatientDashboard = () => {
                 Up next
               </p>
 
-              <h2>
-                Next Dose
-              </h2>
+              <h2>Next Dose</h2>
 
               <p>
                 Your next scheduled medication
@@ -358,6 +366,7 @@ const PatientDashboard = () => {
             </div>
 
             <span className="status-pill pending">
+              <Clock3 size={13} />
               Pending
             </span>
           </div>
@@ -372,11 +381,17 @@ const PatientDashboard = () => {
                 {getMedicineName(nextDose)}
               </h3>
 
-              <p>
-                {getDosage(nextDose)}
-                <span> | </span>
-                {getTime(nextDose)}
-              </p>
+              <div className="dose-meta">
+                <span>
+                  <Pill size={13} />
+                  {getDosage(nextDose)}
+                </span>
+
+                <span>
+                  <Clock3 size={13} />
+                  {getTime(nextDose)}
+                </span>
+              </div>
 
               {nextDose.instructions && (
                 <span className="instructions">
@@ -386,6 +401,7 @@ const PatientDashboard = () => {
             </div>
 
             <button
+              type="button"
               className="take-button"
               disabled={
                 actionLoading === nextDose.id
@@ -399,9 +415,11 @@ const PatientDashboard = () => {
             >
               <CheckCircle2 size={17} />
 
-              {actionLoading === nextDose.id
-                ? "Updating..."
-                : "Mark as taken"}
+              <span>
+                {actionLoading === nextDose.id
+                  ? "Updating..."
+                  : "Mark as taken"}
+              </span>
             </button>
           </div>
         </section>
@@ -429,8 +447,13 @@ const PatientDashboard = () => {
                 <strong>
                   {alert.daysRemaining ??
                     alert.days_remaining ??
-                    "-"}{" "}
-                  days
+                    "an unspecified number of"}{" "}
+                  {(
+                    alert.daysRemaining ??
+                    alert.days_remaining
+                  ) === 1
+                    ? "day"
+                    : "days"}
                 </strong>
                 . Please arrange a refill.
               </p>
@@ -443,6 +466,7 @@ const PatientDashboard = () => {
 
       <div className="dashboard-tabs">
         <button
+          type="button"
           className={
             activeTab === "today"
               ? "active"
@@ -452,10 +476,12 @@ const PatientDashboard = () => {
             setActiveTab("today")
           }
         >
-          Today's Reminders
+          <CalendarDays size={15} />
+          <span>Today's Reminders</span>
         </button>
 
         <button
+          type="button"
           className={
             activeTab === "medicines"
               ? "active"
@@ -465,10 +491,12 @@ const PatientDashboard = () => {
             setActiveTab("medicines")
           }
         >
-          My Medicines
+          <Pill size={15} />
+          <span>My Medicines</span>
         </button>
 
         <button
+          type="button"
           className={
             activeTab === "history"
               ? "active"
@@ -478,7 +506,8 @@ const PatientDashboard = () => {
             setActiveTab("history")
           }
         >
-          History
+          <FileText size={15} />
+          <span>History</span>
         </button>
       </div>
 
@@ -492,9 +521,7 @@ const PatientDashboard = () => {
                 Medication plan
               </p>
 
-              <h2>
-                Today's Schedule
-              </h2>
+              <h2>Today's Schedule</h2>
 
               <p>
                 {takenToday} of {reminders.length}{" "}
@@ -503,12 +530,13 @@ const PatientDashboard = () => {
             </div>
 
             <button
+              type="button"
               className="view-link"
               onClick={() =>
                 navigate("/reminders")
               }
             >
-              View reminders
+              <span>View reminders</span>
               <ArrowRight size={16} />
             </button>
           </div>
@@ -528,8 +556,10 @@ const PatientDashboard = () => {
               {pendingReminders.length > 0 && (
                 <>
                   <h3 className="list-heading">
-                    Pending (
-                    {pendingReminders.length})
+                    Pending
+                    <span className="count-badge">
+                      {pendingReminders.length}
+                    </span>
                   </h3>
 
                   {pendingReminders.map(
@@ -552,7 +582,8 @@ const PatientDashboard = () => {
               {completedReminders.length > 0 && (
                 <>
                   <h3 className="list-heading completed-heading">
-                    Completed Today
+                    <CheckCircle2 size={15} />
+                    <span>Completed Today</span>
                   </h3>
 
                   {completedReminders.map(
@@ -581,23 +612,23 @@ const PatientDashboard = () => {
                 Medication inventory
               </p>
 
-              <h2>
-                Active Medicines
-              </h2>
+              <h2>Active Medicines</h2>
 
               <p>
-                Medicines currently tracked in
-                your account
+                Medicines currently tracked in your
+                account
               </p>
             </div>
 
             <button
+              type="button"
               className="primary-button"
               onClick={() =>
                 navigate("/medicines")
               }
             >
-              Manage Medicines
+              <Pill size={15} />
+              <span>Manage Medicines</span>
               <ArrowRight size={16} />
             </button>
           </div>
@@ -635,9 +666,7 @@ const PatientDashboard = () => {
                 Medication records
               </p>
 
-              <h2>
-                Medication History
-              </h2>
+              <h2>Medication History</h2>
 
               <p>
                 Review your complete medication
@@ -646,12 +675,14 @@ const PatientDashboard = () => {
             </div>
 
             <button
+              type="button"
               className="primary-button"
               onClick={() =>
                 navigate("/medicine-history")
               }
             >
-              View History
+              <FileText size={15} />
+              <span>View History</span>
               <ArrowRight size={16} />
             </button>
           </div>
@@ -683,9 +714,7 @@ const SummaryCard = ({
   className,
 }) => {
   return (
-    <div
-      className={`summary-card ${className}`}
-    >
+    <div className={`summary-card ${className}`}>
       <div className="summary-card-top">
         <div className="summary-icon">
           {icon}
@@ -733,11 +762,17 @@ const ReminderCard = ({
             {getMedicineName(reminder)}
           </h3>
 
-          <p>
-            {getDosage(reminder)}
-            <span> | </span>
-            {getTime(reminder)}
-          </p>
+          <div className="reminder-meta">
+            <span>
+              <Pill size={13} />
+              {getDosage(reminder)}
+            </span>
+
+            <span>
+              <Clock3 size={13} />
+              {getTime(reminder)}
+            </span>
+          </div>
 
           {reminder.instructions && (
             <span className="reminder-instructions">
@@ -747,68 +782,80 @@ const ReminderCard = ({
         </div>
       </div>
 
-      {!readOnly &&
-        status === "pending" && (
-          <div className="reminder-actions">
-            <button
-              className="action-taken"
-              disabled={
-                actionLoading ===
-                reminder.id
-              }
-              onClick={() =>
-                onAction(
-                  reminder.id,
-                  "taken"
-                )
-              }
-            >
-              <CheckCircle2 size={15} />
-
+      {!readOnly && status === "pending" && (
+        <div className="reminder-actions">
+          <button
+            type="button"
+            className="action-taken"
+            disabled={
+              actionLoading === reminder.id
+            }
+            onClick={() =>
+              onAction(
+                reminder.id,
+                "taken"
+              )
+            }
+          >
+            <CheckCircle2 size={15} />
+            <span>
               {actionLoading === reminder.id
-                ? "..."
+                ? "Updating..."
                 : "Taken"}
-            </button>
+            </span>
+          </button>
 
-            <button
-              className="action-missed"
-              disabled={
-                actionLoading ===
-                reminder.id
-              }
-              onClick={() =>
-                onAction(
-                  reminder.id,
-                  "missed"
-                )
-              }
-            >
-              Missed
-            </button>
+          <button
+            type="button"
+            className="action-missed"
+            disabled={
+              actionLoading === reminder.id
+            }
+            onClick={() =>
+              onAction(
+                reminder.id,
+                "missed"
+              )
+            }
+          >
+            <CircleSlash2 size={15} />
+            <span>Missed</span>
+          </button>
 
-            <button
-              className="action-snooze"
-              disabled={
-                actionLoading ===
-                reminder.id
-              }
-              onClick={() =>
-                onAction(
-                  reminder.id,
-                  "snoozed"
-                )
-              }
-            >
-              Snooze
-            </button>
-          </div>
-        )}
+          <button
+            type="button"
+            className="action-snooze"
+            disabled={
+              actionLoading === reminder.id
+            }
+            onClick={() =>
+              onAction(
+                reminder.id,
+                "snoozed"
+              )
+            }
+          >
+            <AlarmClock size={15} />
+            <span>Snooze</span>
+          </button>
+        </div>
+      )}
 
       {readOnly && (
         <span
           className={`status-pill ${status}`}
         >
-          {status}
+          {status === "taken" ? (
+            <CheckCircle2 size={13} />
+          ) : status === "missed" ? (
+            <CircleSlash2 size={13} />
+          ) : (
+            <Clock3 size={13} />
+          )}
+
+          <span>
+            {status}
+          </span>
         </span>
       )}
     </div>
@@ -845,18 +892,22 @@ const MedicineCard = ({ medicine }) => {
           <h3>{medicine.name}</h3>
 
           <p>
-            {medicine.dosage || "-"}
+            {medicine.dosage ||
+              "Dosage not specified"}
           </p>
         </div>
       </div>
 
       <div className="medicine-meta">
         <span>
-          {medicine.frequency || "-"}
+          <Clock3 size={12} />
+          {medicine.frequency ||
+            "Frequency not specified"}
         </span>
 
         {medicine.condition && (
           <span>
+            <Activity size={12} />
             {medicine.condition}
           </span>
         )}
@@ -864,9 +915,7 @@ const MedicineCard = ({ medicine }) => {
 
       <div className="stock-area">
         <div className="stock-header">
-          <span>
-            Stock
-          </span>
+          <span>Stock</span>
 
           <strong>
             {remaining}/{total}
@@ -913,10 +962,11 @@ const EmptyState = ({
 
       {action && (
         <button
+          type="button"
           className="primary-button"
           onClick={onAction}
         >
-          {action}
+          <span>{action}</span>
           <ArrowRight size={16} />
         </button>
       )}
@@ -932,8 +982,8 @@ const dashboardStyles = `
   .patient-dashboard-page {
     padding: 28px;
     min-height: calc(100vh - 80px);
-    background: #f7f9fc;
-    color: #172033;
+    background: var(--color-bg, #f7f9fc);
+    color: var(--color-text, #172033);
   }
 
   .dashboard-header {
@@ -947,7 +997,7 @@ const dashboardStyles = `
   .dashboard-eyebrow,
   .section-kicker {
     margin: 0 0 6px;
-    color: #14a899;
+    color: var(--color-primary, #2f8f7f);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -959,12 +1009,12 @@ const dashboardStyles = `
     font-size: 30px;
     line-height: 1.15;
     font-weight: 750;
-    color: #162033;
+    color: var(--color-text, #162033);
   }
 
   .dashboard-subtitle {
     margin: 8px 0 0;
-    color: #697386;
+    color: var(--color-text-muted, #697386);
     font-size: 14px;
   }
 
@@ -972,13 +1022,20 @@ const dashboardStyles = `
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    border: 1px solid #dce3eb;
+    border: 1px solid var(--color-border, #dce3eb);
     border-radius: 10px;
-    background: #fff;
+    background: var(--color-surface, #fff);
     padding: 10px 14px;
-    color: #344054;
+    color: var(--color-text, #344054);
     font-weight: 600;
     cursor: pointer;
+    transition: .2s ease;
+  }
+
+  .header-action:hover {
+    border-color: var(--color-primary, #2f8f7f);
+    color: var(--color-primary, #2f8f7f);
+    transform: translateY(-1px);
   }
 
   .dashboard-error {
@@ -994,7 +1051,10 @@ const dashboardStyles = `
     font-size: 13px;
   }
 
-  .dashboard-error button {
+  .dashboard-error > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     margin-left: auto;
     border: 0;
     background: transparent;
@@ -1011,11 +1071,11 @@ const dashboardStyles = `
   }
 
   .summary-card {
-    background: #fff;
-    border: 1px solid #e7ebf0;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e7ebf0);
     border-radius: 14px;
     padding: 18px;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, .03);
+    box-shadow: var(--shadow-soft, 0 2px 8px rgba(15, 23, 42, .03));
   }
 
   .summary-card-top {
@@ -1053,13 +1113,13 @@ const dashboardStyles = `
 
   .summary-label {
     margin: 0;
-    color: #697386;
+    color: var(--color-text-muted, #697386);
     font-size: 13px;
   }
 
   .summary-value {
     margin: 7px 0 3px;
-    color: #162033;
+    color: var(--color-text, #162033);
     font-size: 29px;
     line-height: 1;
   }
@@ -1071,12 +1131,12 @@ const dashboardStyles = `
   }
 
   .dashboard-panel {
-    background: #fff;
-    border: 1px solid #e7ebf0;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e7ebf0);
     border-radius: 14px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, .03);
+    box-shadow: var(--shadow-soft, 0 2px 8px rgba(15, 23, 42, .03));
   }
 
   .panel-header {
@@ -1089,19 +1149,20 @@ const dashboardStyles = `
 
   .panel-header h2 {
     margin: 0;
-    color: #172033;
+    color: var(--color-text, #172033);
     font-size: 19px;
   }
 
   .panel-header > div > p:last-child {
     margin: 5px 0 0;
-    color: #7b8495;
+    color: var(--color-text-muted, #7b8495);
     font-size: 13px;
   }
 
   .status-pill {
     display: inline-flex;
     align-items: center;
+    gap: 5px;
     padding: 5px 10px;
     border-radius: 999px;
     font-size: 11px;
@@ -1122,6 +1183,11 @@ const dashboardStyles = `
   .status-pill.missed {
     background: #fff1f3;
     color: #b42318;
+  }
+
+  .status-pill.snoozed {
+    background: #f2f4f7;
+    color: #475467;
   }
 
   .next-dose-content {
@@ -1153,14 +1219,26 @@ const dashboardStyles = `
 
   .next-dose-info h3 {
     margin: 0;
-    color: #172033;
+    color: var(--color-text, #172033);
     font-size: 16px;
   }
 
-  .next-dose-info p {
-    margin: 5px 0 0;
+  .dose-meta,
+  .reminder-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
     color: #697386;
-    font-size: 13px;
+    font-size: 12px;
+  }
+
+  .dose-meta span,
+  .reminder-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
 
   .instructions,
@@ -1179,7 +1257,7 @@ const dashboardStyles = `
     gap: 7px;
     border: 0;
     border-radius: 9px;
-    background: #14b8a6;
+    background: var(--color-primary, #2f8f7f);
     color: #fff;
     padding: 10px 14px;
     font-size: 13px;
@@ -1189,7 +1267,7 @@ const dashboardStyles = `
 
   .take-button:hover,
   .primary-button:hover {
-    background: #0f9f90;
+    background: var(--color-primary-dark, #26786a);
   }
 
   .take-button:disabled {
@@ -1231,6 +1309,9 @@ const dashboardStyles = `
   }
 
   .dashboard-tabs button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     border: 0;
     border-radius: 8px;
     background: transparent;
@@ -1242,8 +1323,8 @@ const dashboardStyles = `
   }
 
   .dashboard-tabs button.active {
-    background: #fff;
-    color: #172033;
+    background: var(--color-surface, #fff);
+    color: var(--color-primary, #2f8f7f);
     box-shadow: 0 1px 4px rgba(15, 23, 42, .08);
   }
 
@@ -1253,16 +1334,29 @@ const dashboardStyles = `
     gap: 5px;
     border: 0;
     background: transparent;
-    color: #0f9488;
+    color: var(--color-primary, #2f8f7f);
     font-weight: 650;
     font-size: 13px;
     cursor: pointer;
   }
 
   .list-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     margin: 0 0 10px;
     color: #344054;
     font-size: 13px;
+  }
+
+  .count-badge {
+    min-width: 20px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #e8f5f1;
+    color: #2f8f7f;
+    font-size: 10px;
+    text-align: center;
   }
 
   .completed-heading {
@@ -1312,14 +1406,8 @@ const dashboardStyles = `
 
   .reminder-info h3 {
     margin: 0;
-    color: #172033;
+    color: var(--color-text, #172033);
     font-size: 14px;
-  }
-
-  .reminder-info p {
-    margin: 4px 0 0;
-    color: #697386;
-    font-size: 12px;
   }
 
   .reminder-actions {
@@ -1354,13 +1442,18 @@ const dashboardStyles = `
 
   .action-snooze {
     border: 1px solid #d0d5dd;
-    background: #fff;
+    background: var(--color-surface, #fff);
     color: #475467;
+  }
+
+  .reminder-actions button:hover {
+    transform: translateY(-1px);
   }
 
   .reminder-actions button:disabled {
     opacity: .55;
     cursor: not-allowed;
+    transform: none;
   }
 
   .medicine-grid {
@@ -1373,7 +1466,7 @@ const dashboardStyles = `
     border: 1px solid #e8edf2;
     border-radius: 12px;
     padding: 16px;
-    background: #fff;
+    background: var(--color-surface, #fff);
   }
 
   .medicine-card-header {
@@ -1395,7 +1488,7 @@ const dashboardStyles = `
 
   .medicine-card h3 {
     margin: 0;
-    color: #172033;
+    color: var(--color-text, #172033);
     font-size: 14px;
   }
 
@@ -1413,6 +1506,9 @@ const dashboardStyles = `
   }
 
   .medicine-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     padding: 5px 8px;
     border-radius: 6px;
     background: #f2f4f7;
@@ -1473,7 +1569,7 @@ const dashboardStyles = `
 
   .empty-state h3 {
     margin: 0;
-    color: #172033;
+    color: var(--color-text, #172033);
     font-size: 16px;
   }
 
@@ -1485,13 +1581,16 @@ const dashboardStyles = `
   }
 
   .loading-spinner {
-    width: 28px;
-    height: 28px;
+    width: 46px;
+    height: 46px;
     margin-bottom: 12px;
-    border: 3px solid #dcefed;
-    border-top-color: #14b8a6;
-    border-radius: 50%;
-    animation: patient-spin .75s linear infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: #e7f8f5;
+    color: #2f8f7f;
+    animation: patient-spin .9s linear infinite;
   }
 
   @keyframes patient-spin {
@@ -1517,6 +1616,10 @@ const dashboardStyles = `
 
     .dashboard-header {
       flex-direction: column;
+    }
+
+    .header-action {
+      width: 100%;
     }
 
     .next-dose-content {
@@ -1567,6 +1670,11 @@ const dashboardStyles = `
 
     .view-link {
       padding: 0;
+    }
+
+    .reminder-actions button {
+      flex: 1;
+      justify-content: center;
     }
   }
 `;

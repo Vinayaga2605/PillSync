@@ -2,18 +2,25 @@
 
 const authService = {
   login: async (username, password) => {
-    const res = await api.post("/auth/login/", { username, password });
+    const res = await api.post("/auth/login/", {
+      username,
+      password,
+    });
+
     localStorage.setItem("access_token", res.data.access);
     localStorage.setItem("refresh_token", res.data.refresh);
     localStorage.setItem("user", JSON.stringify(res.data.user));
+
     return res.data;
   },
 
   register: async (payload) => {
     const res = await api.post("/auth/register/", payload);
+
     localStorage.setItem("access_token", res.data.access);
     localStorage.setItem("refresh_token", res.data.refresh);
     localStorage.setItem("user", JSON.stringify(res.data.user));
+
     return res.data;
   },
 
@@ -33,19 +40,29 @@ const authService = {
     return res.data;
   },
 
-  // Mocked until backend endpoints exist
   forgotPassword: async (email) => {
-    console.log("Mock: password reset link requested for", email);
-    return Promise.resolve({ message: "Reset link sent" });
+    const res = await api.post("/auth/forgot-password/", {
+      email,
+    });
+
+    return res.data;
   },
 
-  resetPassword: async (token, newPassword) => {
-    console.log("Mock: password reset with token", token, "new password set");
-    return Promise.resolve({ message: "Password reset successful" });
+  resetPassword: async (
+    uid,
+    token,
+    newPassword,
+    confirmPassword
+  ) => {
+    const res = await api.post("/auth/reset-password/", {
+      uid,
+      token,
+      new_password: newPassword,
+      confirm_password: confirmPassword,
+    });
+
+    return res.data;
   },
 };
 
 export default authService;
-
-
-

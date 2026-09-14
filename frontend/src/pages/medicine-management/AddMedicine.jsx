@@ -6,6 +6,8 @@ import {
   Save,
   CheckCircle2,
   Pill,
+  Clock3,
+  Package,
 } from "lucide-react";
 import medicationService from "../../services/medicationService";
 
@@ -99,11 +101,12 @@ const AddMedicine = () => {
     <div className="vin-medicine-page">
       <div className="vin-add-header">
         <button
+          type="button"
           className="vin-back-button"
           onClick={() => navigate("/medicines")}
         >
           <ArrowLeft size={16} />
-          Back to medicines
+          <span>Back to medicines</span>
         </button>
 
         <h1>Add medicine</h1>
@@ -139,7 +142,7 @@ const AddMedicine = () => {
       </div>
 
       {error && (
-        <div className="vin-error">
+        <div className="vin-error" role="alert">
           {error}
         </div>
       )}
@@ -192,7 +195,7 @@ const AddMedicine = () => {
           <div className="vin-step-content">
             <div className="vin-step-title">
               <div className="vin-step-icon">
-                <ArrowRight size={20} />
+                <Clock3 size={20} />
               </div>
 
               <div>
@@ -245,7 +248,7 @@ const AddMedicine = () => {
           <div className="vin-step-content">
             <div className="vin-step-title">
               <div className="vin-step-icon">
-                <Save size={20} />
+                <Package size={20} />
               </div>
 
               <div>
@@ -302,25 +305,29 @@ const AddMedicine = () => {
             <div className="vin-review-grid">
               <div>
                 <span>Medicine</span>
-                <strong>{form.name || "â€”"}</strong>
+                <strong>
+                  {form.name || "Not provided"}
+                </strong>
               </div>
 
               <div>
                 <span>Condition</span>
                 <strong>
-                  {form.condition || "â€”"}
+                  {form.condition || "Not provided"}
                 </strong>
               </div>
 
               <div>
                 <span>Dosage</span>
-                <strong>{form.dosage || "â€”"}</strong>
+                <strong>
+                  {form.dosage || "Not provided"}
+                </strong>
               </div>
 
               <div>
                 <span>Frequency</span>
                 <strong>
-                  {form.frequency || "â€”"}
+                  {form.frequency || "Not provided"}
                 </strong>
               </div>
 
@@ -350,7 +357,7 @@ const AddMedicine = () => {
             disabled={step === 0 || saving}
           >
             <ArrowLeft size={16} />
-            Back
+            <span>Back</span>
           </button>
 
           {step < 3 ? (
@@ -359,7 +366,7 @@ const AddMedicine = () => {
               className="vin-primary-btn"
               onClick={nextStep}
             >
-              Continue
+              <span>Continue</span>
               <ArrowRight size={16} />
             </button>
           ) : (
@@ -369,7 +376,9 @@ const AddMedicine = () => {
               disabled={saving}
             >
               <Save size={16} />
-              {saving ? "Saving..." : "Save medicine"}
+              <span>
+                {saving ? "Saving..." : "Save medicine"}
+              </span>
             </button>
           )}
         </div>
@@ -379,6 +388,3 @@ const AddMedicine = () => {
 };
 
 export default AddMedicine;
-
-
-

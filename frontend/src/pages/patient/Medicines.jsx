@@ -17,6 +17,9 @@ import {
   AlertTriangle,
   Stethoscope,
   Package,
+  CircleAlert,
+  CheckCircle2,
+  FileText,
 } from "lucide-react";
 
 import medicationService from "../../services/medicationService";
@@ -45,6 +48,7 @@ const getStatus = (medicine) => {
   const total = Number(medicine.total_stock || 0);
 
   if (remaining <= 0) return "Out of stock";
+
   if (total > 0 && remaining <= total * 0.2) {
     return "Low stock";
   }
@@ -470,17 +474,19 @@ const Medicines = () => {
         </div>
 
         <button
+          type="button"
           className="vin-primary-btn"
           onClick={openAdd}
         >
           <Plus size={17} />
-          Add medicine
+          <span>Add medicine</span>
         </button>
       </div>
 
       {error && (
-        <div className="vin-error">
-          {error}
+        <div className="vin-error" role="alert">
+          <CircleAlert size={16} />
+          <span>{error}</span>
         </div>
       )}
 
@@ -488,6 +494,7 @@ const Medicines = () => {
       <div className="vin-toolbar">
         <div className="vin-search">
           <Search size={16} />
+
           <input
             value={search}
             onChange={(event) =>
@@ -498,6 +505,7 @@ const Medicines = () => {
         </div>
 
         <button
+          type="button"
           className={`vin-secondary-btn ${
             showFilters ? "vin-active-control" : ""
           }`}
@@ -506,28 +514,34 @@ const Medicines = () => {
           }
         >
           <Filter size={16} />
-          Filters
+          <span>Filters</span>
         </button>
 
         <div className="vin-view-toggle">
           <button
+            type="button"
             className={
               layout === "grid"
                 ? "vin-view-active"
                 : ""
             }
             onClick={() => setLayout("grid")}
+            title="Grid view"
+            aria-label="Grid view"
           >
             <Grid3X3 size={16} />
           </button>
 
           <button
+            type="button"
             className={
               layout === "table"
                 ? "vin-view-active"
                 : ""
             }
             onClick={() => setLayout("table")}
+            title="Table view"
+            aria-label="Table view"
           >
             <List size={16} />
           </button>
@@ -541,8 +555,11 @@ const Medicines = () => {
             <strong>Advanced filters</strong>
 
             <button
+              type="button"
               onClick={() => setShowFilters(false)}
               className="vin-icon-button"
+              title="Close filters"
+              aria-label="Close filters"
             >
               <X size={16} />
             </button>
@@ -565,12 +582,15 @@ const Medicines = () => {
                 <option value="">
                   All statuses
                 </option>
+
                 <option value="Active">
                   Active
                 </option>
+
                 <option value="Low stock">
                   Low stock
                 </option>
+
                 <option value="Out of stock">
                   Out of stock
                 </option>
@@ -639,10 +659,11 @@ const Medicines = () => {
           </div>
 
           <button
+            type="button"
             className="vin-clear-filters"
             onClick={clearFilters}
           >
-            Clear all filters
+            Refresh filters
           </button>
         </div>
       )}
@@ -662,11 +683,12 @@ const Medicines = () => {
           </p>
 
           <button
+            type="button"
             className="vin-primary-btn"
             onClick={openAdd}
           >
             <Plus size={17} />
-            Add medicine
+            <span>Add medicine</span>
           </button>
         </div>
       )}
@@ -697,6 +719,7 @@ const Medicines = () => {
 
                     <div className="vin-card-title">
                       <h3>{medicine.name}</h3>
+
                       <p>
                         {medicine.condition ||
                           "General medication"}
@@ -718,13 +741,15 @@ const Medicines = () => {
                         "Medication"}
                     </span>
 
-                    <span>
+                    <span className="vin-meta-item">
+                      <FileText size={12} />
                       {medicine.dosage}
                     </span>
 
-                    <span>â€¢</span>
+                    <span className="vin-meta-divider" aria-hidden="true" />
 
-                    <span>
+                    <span className="vin-meta-item">
+                      <Clock size={12} />
                       {medicine.frequency}
                     </span>
                   </div>
@@ -760,6 +785,7 @@ const Medicines = () => {
                   <div className="vin-card-footer">
                     <span className="vin-reminder">
                       <Clock size={13} />
+
                       {medicine.doses_per_day || 1} dose
                       {medicine.doses_per_day === 1
                         ? ""
@@ -769,7 +795,9 @@ const Medicines = () => {
 
                     <div className="vin-actions">
                       <button
-                        title="View"
+                        type="button"
+                        title="View medicine"
+                        aria-label="View medicine"
                         onClick={() =>
                           openDetails(medicine)
                         }
@@ -778,7 +806,9 @@ const Medicines = () => {
                       </button>
 
                       <button
-                        title="Edit"
+                        type="button"
+                        title="Edit medicine"
+                        aria-label="Edit medicine"
                         onClick={() =>
                           openEdit(medicine)
                         }
@@ -787,7 +817,9 @@ const Medicines = () => {
                       </button>
 
                       <button
-                        title="Refill"
+                        type="button"
+                        title="Refill medicine"
+                        aria-label="Refill medicine"
                         onClick={() =>
                           openRefill(medicine)
                         }
@@ -796,7 +828,9 @@ const Medicines = () => {
                       </button>
 
                       <button
-                        title="Delete"
+                        type="button"
+                        title="Delete medicine"
+                        aria-label="Delete medicine"
                         className="vin-delete-action"
                         onClick={() =>
                           setDeleteMedicine(
@@ -824,22 +858,10 @@ const Medicines = () => {
                   <tr>
                     {[
                       ["name", "Medicine"],
-                      [
-                        "condition",
-                        "Condition",
-                      ],
-                      [
-                        "dosage",
-                        "Dosage",
-                      ],
-                      [
-                        "remaining_stock",
-                        "Remaining",
-                      ],
-                      [
-                        "frequency",
-                        "Frequency",
-                      ],
+                      ["condition", "Condition"],
+                      ["dosage", "Dosage"],
+                      ["remaining_stock", "Remaining"],
+                      ["frequency", "Frequency"],
                     ].map(([key, label]) => (
                       <th
                         key={key}
@@ -853,13 +875,9 @@ const Medicines = () => {
                           {sort.key === key &&
                             (sort.direction ===
                             "asc" ? (
-                              <ChevronUp
-                                size={12}
-                              />
+                              <ChevronUp size={12} />
                             ) : (
-                              <ChevronDown
-                                size={12}
-                              />
+                              <ChevronDown size={12} />
                             ))}
                         </span>
                       </th>
@@ -907,7 +925,7 @@ const Medicines = () => {
 
                           <td>
                             {medicine.condition ||
-                              "â€”"}
+                              "Not specified"}
                           </td>
 
                           <td>
@@ -947,13 +965,31 @@ const Medicines = () => {
                                 status
                               )}`}
                             >
-                              {status}
+                              {status === "Active" ? (
+                                <>
+                                  <CheckCircle2 size={12} />
+                                  Active
+                                </>
+                              ) : status === "Low stock" ? (
+                                <>
+                                  <CircleAlert size={12} />
+                                  Low stock
+                                </>
+                              ) : (
+                                <>
+                                  <AlertTriangle size={12} />
+                                  Out of stock
+                                </>
+                              )}
                             </span>
                           </td>
 
                           <td>
                             <div className="vin-table-actions">
                               <button
+                                type="button"
+                                title="View medicine"
+                                aria-label="View medicine"
                                 onClick={() =>
                                   openDetails(
                                     medicine
@@ -964,6 +1000,9 @@ const Medicines = () => {
                               </button>
 
                               <button
+                                type="button"
+                                title="Edit medicine"
+                                aria-label="Edit medicine"
                                 onClick={() =>
                                   openEdit(
                                     medicine
@@ -974,15 +1013,16 @@ const Medicines = () => {
                               </button>
 
                               <button
+                                type="button"
+                                title="Delete medicine"
+                                aria-label="Delete medicine"
                                 onClick={() =>
                                   setDeleteMedicine(
                                     medicine
                                   )
                                 }
                               >
-                                <Trash2
-                                  size={15}
-                                />
+                                <Trash2 size={15} />
                               </button>
                             </div>
                           </td>
@@ -1024,11 +1064,14 @@ const Medicines = () => {
               </div>
 
               <button
+                type="button"
                 className="vin-icon-button"
                 onClick={() =>
                   !saving &&
                   setShowForm(false)
                 }
+                title="Close"
+                aria-label="Close"
               >
                 <X size={18} />
               </button>
@@ -1129,7 +1172,8 @@ const Medicines = () => {
                   }
                   disabled={saving}
                 >
-                  Cancel
+                  <X size={15} />
+                  <span>Cancel</span>
                 </button>
 
                 <button
@@ -1137,11 +1181,14 @@ const Medicines = () => {
                   className="vin-primary-btn"
                   disabled={saving}
                 >
-                  {saving
-                    ? "Saving..."
-                    : editingId
-                    ? "Save changes"
-                    : "Save medicine"}
+                  <SaveIcon saving={saving} />
+                  <span>
+                    {saving
+                      ? "Saving..."
+                      : editingId
+                      ? "Save changes"
+                      : "Save medicine"}
+                  </span>
                 </button>
               </div>
             </form>
@@ -1174,18 +1221,28 @@ const Medicines = () => {
                     {selectedMedicine.name}
                   </h2>
 
-                  <p>
-                    {selectedMedicine.dosage} â€¢{" "}
-                    {selectedMedicine.frequency}
-                  </p>
+                  <div className="vin-detail-meta">
+                    <span>
+                      <FileText size={13} />
+                      {selectedMedicine.dosage}
+                    </span>
+
+                    <span>
+                      <Clock size={13} />
+                      {selectedMedicine.frequency}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <button
+                type="button"
                 className="vin-icon-button"
                 onClick={() =>
                   setSelectedMedicine(null)
                 }
+                title="Close"
+                aria-label="Close"
               >
                 <X size={18} />
               </button>
@@ -1199,6 +1256,7 @@ const Medicines = () => {
 
                 <div>
                   <small>Remaining stock</small>
+
                   <strong>
                     {
                       selectedMedicine.remaining_stock
@@ -1218,6 +1276,7 @@ const Medicines = () => {
 
                 <div>
                   <small>Doses per day</small>
+
                   <strong>
                     {selectedMedicine.doses_per_day ||
                       1}
@@ -1232,6 +1291,7 @@ const Medicines = () => {
 
                 <div>
                   <small>Condition</small>
+
                   <strong>
                     {selectedMedicine.condition ||
                       "Not specified"}
@@ -1244,6 +1304,7 @@ const Medicines = () => {
               <div className="vin-section-header">
                 <div>
                   <h3>Medicine history</h3>
+
                   <p>
                     Recorded dose activity for this
                     medicine.
@@ -1252,12 +1313,17 @@ const Medicines = () => {
               </div>
 
               {historyLoading ? (
-                <p className="vin-muted">
-                  Loading history...
-                </p>
+                <div className="vin-status-message">
+                  <RefreshCw
+                    size={16}
+                    className="vin-loading-icon"
+                  />
+                  <span>Loading history...</span>
+                </div>
               ) : history.length === 0 ? (
                 <div className="vin-history-empty">
-                  No dose history yet.
+                  <FileText size={19} />
+                  <span>No dose history yet.</span>
                 </div>
               ) : (
                 <div className="vin-history-list">
@@ -1287,7 +1353,22 @@ const Medicines = () => {
                             : "vin-history-pending"
                         }`}
                       >
-                        {item.status}
+                        {item.status === "taken" ? (
+                          <>
+                            <CheckCircle2 size={12} />
+                            Taken
+                          </>
+                        ) : item.status === "missed" ? (
+                          <>
+                            <AlertTriangle size={12} />
+                            Missed
+                          </>
+                        ) : (
+                          <>
+                            <Clock size={12} />
+                            Pending
+                          </>
+                        )}
                       </span>
                     </div>
                   ))}
@@ -1297,15 +1378,18 @@ const Medicines = () => {
 
             <div className="vin-modal-actions">
               <button
+                type="button"
                 className="vin-secondary-btn"
                 onClick={() =>
                   setSelectedMedicine(null)
                 }
               >
-                Close
+                <X size={15} />
+                <span>Close</span>
               </button>
 
               <button
+                type="button"
                 className="vin-primary-btn"
                 onClick={() => {
                   setSelectedMedicine(null);
@@ -1315,7 +1399,7 @@ const Medicines = () => {
                 }}
               >
                 <RefreshCw size={16} />
-                Refill
+                <span>Refill</span>
               </button>
             </div>
           </div>
@@ -1339,6 +1423,7 @@ const Medicines = () => {
             <div className="vin-modal-header">
               <div>
                 <h2>Refill medicine</h2>
+
                 <p>
                   Add stock for{" "}
                   <strong>
@@ -1349,11 +1434,14 @@ const Medicines = () => {
               </div>
 
               <button
+                type="button"
                 className="vin-icon-button"
                 onClick={() =>
                   !refilling &&
                   setShowRefill(false)
                 }
+                title="Close"
+                aria-label="Close"
               >
                 <X size={18} />
               </button>
@@ -1362,6 +1450,7 @@ const Medicines = () => {
             <form onSubmit={handleRefill}>
               <label>
                 Refill quantity
+
                 <input
                   type="number"
                   min="1"
@@ -1378,7 +1467,8 @@ const Medicines = () => {
               </label>
 
               <div className="vin-refill-summary">
-                Current stock:{" "}
+                <span>Current stock</span>
+
                 <strong>
                   {
                     refillMedicine.remaining_stock
@@ -1395,7 +1485,8 @@ const Medicines = () => {
                   }
                   disabled={refilling}
                 >
-                  Cancel
+                  <X size={15} />
+                  <span>Cancel</span>
                 </button>
 
                 <button
@@ -1403,9 +1494,19 @@ const Medicines = () => {
                   className="vin-primary-btn"
                   disabled={refilling}
                 >
-                  {refilling
-                    ? "Refilling..."
-                    : "Refill"}
+                  <RefreshCw
+                    size={16}
+                    className={
+                      refilling
+                        ? "vin-spin"
+                        : ""
+                    }
+                  />
+                  <span>
+                    {refilling
+                      ? "Refilling..."
+                      : "Refill"}
+                  </span>
                 </button>
               </div>
             </form>
@@ -1432,23 +1533,29 @@ const Medicines = () => {
 
             <div className="vin-modal-actions">
               <button
+                type="button"
                 className="vin-secondary-btn"
                 onClick={() =>
                   setDeleteMedicine(null)
                 }
                 disabled={deleting}
               >
-                Cancel
+                <X size={15} />
+                <span>Cancel</span>
               </button>
 
               <button
+                type="button"
                 className="vin-danger-btn"
                 onClick={confirmDelete}
                 disabled={deleting}
               >
-                {deleting
-                  ? "Deleting..."
-                  : "Delete"}
+                <Trash2 size={16} />
+                <span>
+                  {deleting
+                    ? "Deleting..."
+                    : "Delete"}
+                </span>
               </button>
             </div>
           </div>
@@ -1461,7 +1568,7 @@ const Medicines = () => {
           max-width: 1180px;
           margin: 0 auto;
           padding: 4px 2px 40px;
-          color: #334155;
+          color: var(--color-text, #334155);
         }
 
         .vin-medicine-header {
@@ -1476,12 +1583,12 @@ const Medicines = () => {
           margin: 0;
           font-size: 28px;
           font-weight: 700;
-          color: #1e293b;
+          color: var(--color-text, #1e293b);
         }
 
         .vin-medicine-header p {
           margin: 5px 0 0;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 14px;
         }
 
@@ -1503,28 +1610,41 @@ const Medicines = () => {
 
         .vin-primary-btn {
           color: white;
-          background: linear-gradient(
-            135deg,
-            #2563eb,
-            #3b82f6
-          );
-          box-shadow:
-            0 8px 20px rgba(37, 99, 235, 0.18);
+          background: var(--color-primary, #2f8f7f);
+          box-shadow: 0 8px 20px rgba(47, 143, 127, 0.18);
         }
 
         .vin-primary-btn:hover {
+          background: var(--color-primary-dark, #26786a);
           transform: translateY(-1px);
         }
 
+        .vin-primary-btn:disabled,
+        .vin-secondary-btn:disabled,
+        .vin-danger-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
+
         .vin-secondary-btn {
-          color: #64748b;
-          background: white;
-          border: 1px solid #e2e8f0;
+          color: var(--color-text-muted, #64748b);
+          background: var(--color-surface, white);
+          border: 1px solid var(--color-border, #e2e8f0);
         }
 
         .vin-secondary-btn:hover {
           border-color: #cbd5e1;
-          color: #334155;
+          color: var(--color-text, #334155);
+        }
+
+        .vin-danger-btn {
+          color: white;
+          background: #ef4444;
+        }
+
+        .vin-danger-btn:hover {
+          background: #dc2626;
         }
 
         .vin-toolbar {
@@ -1541,13 +1661,13 @@ const Medicines = () => {
           align-items: center;
           gap: 9px;
           padding: 0 14px;
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--color-surface, white);
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 14px;
         }
 
         .vin-search svg {
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           flex-shrink: 0;
         }
 
@@ -1556,12 +1676,12 @@ const Medicines = () => {
           border: none;
           outline: none;
           background: transparent;
-          color: #334155;
+          color: var(--color-text, #334155);
           font-size: 14px;
         }
 
         .vin-search input::placeholder {
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
         }
 
         .vin-view-toggle {
@@ -1570,7 +1690,7 @@ const Medicines = () => {
           gap: 3px;
           padding: 4px;
           border-radius: 13px;
-          background: #f1f5f9;
+          background: var(--color-surface-alt, #f1f5f9);
         }
 
         .vin-view-toggle button {
@@ -1587,24 +1707,24 @@ const Medicines = () => {
         }
 
         .vin-view-toggle button.vin-view-active {
-          background: white;
-          color: #2563eb;
+          background: var(--color-surface, white);
+          color: var(--color-primary, #2f8f7f);
           box-shadow: 0 2px 7px rgba(15, 23, 42, 0.08);
         }
 
         .vin-active-control {
-          color: #2563eb;
-          border-color: #93c5fd;
-          background: #eff6ff;
+          color: var(--color-primary, #2f8f7f);
+          border-color: #a7d8cf;
+          background: var(--color-primary-light, #e8f5f1);
         }
 
         .vin-filter-panel {
           padding: 20px;
           margin-bottom: 18px;
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--color-surface, white);
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 18px;
-          box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+          box-shadow: var(--shadow-soft, 0 6px 18px rgba(15, 23, 42, 0.05));
         }
 
         .vin-filter-header {
@@ -1612,21 +1732,26 @@ const Medicines = () => {
           align-items: center;
           justify-content: space-between;
           margin-bottom: 16px;
-          color: #334155;
+          color: var(--color-text, #334155);
           font-size: 14px;
         }
 
         .vin-icon-button {
           width: 36px;
           height: 36px;
-          border: 1px solid #e2e8f0;
-          background: white;
-          color: #94a3b8;
+          border: 1px solid var(--color-border, #e2e8f0);
+          background: var(--color-surface, white);
+          color: var(--color-text-muted, #94a3b8);
           border-radius: 10px;
           cursor: pointer;
           display: inline-flex;
           align-items: center;
           justify-content: center;
+        }
+
+        .vin-icon-button:hover {
+          color: var(--color-text, #334155);
+          border-color: #cbd5e1;
         }
 
         .vin-filter-grid {
@@ -1654,50 +1779,50 @@ const Medicines = () => {
           min-height: 42px;
           padding: 0 12px;
           border-radius: 12px;
-          border: 1px solid #e2e8f0;
-          background: white;
+          border: 1px solid var(--color-border, #e2e8f0);
+          background: var(--color-surface, white);
           outline: none;
-          color: #334155;
+          color: var(--color-text, #334155);
           font-size: 14px;
         }
 
         .vin-filter-grid select:focus,
         .vin-form-grid input:focus,
         .vin-small-modal input:focus {
-          border-color: #93c5fd;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+          border-color: var(--color-primary, #2f8f7f);
+          box-shadow: 0 0 0 3px rgba(47, 143, 127, 0.1);
         }
 
         .vin-clear-filters {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
           margin-top: 15px;
           padding: 0;
           background: none;
           border: 0;
-          color: #94a3b8;
+          color: var(--color-primary, #2f8f7f);
           font-size: 12px;
           font-weight: 700;
           cursor: pointer;
         }
 
         .vin-clear-filters:hover {
-          color: #ef4444;
+          color: var(--color-primary-dark, #26786a);
         }
 
         .vin-medicine-grid {
           display: grid;
-          grid-template-columns: repeat(
-            3,
-            minmax(0, 1fr)
-          );
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 18px;
         }
 
         .vin-medicine-card {
           padding: 20px;
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--color-surface, white);
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 18px;
-          box-shadow: 0 5px 17px rgba(15, 23, 42, 0.05);
+          box-shadow: var(--shadow-soft, 0 5px 17px rgba(15, 23, 42, 0.05));
         }
 
         .vin-card-top {
@@ -1715,8 +1840,8 @@ const Medicines = () => {
           align-items: center;
           justify-content: center;
           border-radius: 14px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--color-primary-light, #e8f5f1);
+          color: var(--color-primary, #2f8f7f);
         }
 
         .vin-card-title {
@@ -1727,7 +1852,7 @@ const Medicines = () => {
         .vin-card-title h3 {
           margin: 0;
           font-size: 15px;
-          color: #334155;
+          color: var(--color-text, #334155);
           font-weight: 700;
           white-space: nowrap;
           overflow: hidden;
@@ -1736,7 +1861,7 @@ const Medicines = () => {
 
         .vin-card-title p {
           margin: 4px 0 0;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 12px;
           white-space: nowrap;
           overflow: hidden;
@@ -1747,6 +1872,7 @@ const Medicines = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          gap: 5px;
           padding: 5px 9px;
           border-radius: 999px;
           font-size: 10px;
@@ -1773,18 +1899,31 @@ const Medicines = () => {
           display: flex;
           align-items: center;
           flex-wrap: wrap;
-          gap: 6px;
+          gap: 8px;
           margin: 15px 0;
-          color: #64748b;
+          color: var(--color-text-muted, #64748b);
           font-size: 12px;
         }
 
         .vin-category {
           padding: 4px 8px;
           border-radius: 999px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--color-primary-light, #e8f5f1);
+          color: var(--color-primary, #2f8f7f);
           font-weight: 600;
+        }
+
+        .vin-meta-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .vin-meta-divider {
+          width: 3px;
+          height: 3px;
+          border-radius: 50%;
+          background: #94a3b8;
         }
 
         .vin-stock-section {
@@ -1795,7 +1934,7 @@ const Medicines = () => {
           display: flex;
           justify-content: space-between;
           margin-bottom: 6px;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 11px;
         }
 
@@ -1834,7 +1973,7 @@ const Medicines = () => {
           display: inline-flex;
           align-items: center;
           gap: 5px;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 11px;
         }
 
@@ -1853,17 +1992,17 @@ const Medicines = () => {
           align-items: center;
           justify-content: center;
           border-radius: 9px;
-          border: 1px solid #e2e8f0;
-          background: white;
+          border: 1px solid var(--color-border, #e2e8f0);
+          background: var(--color-surface, white);
           color: #64748b;
           cursor: pointer;
         }
 
         .vin-actions button:hover,
         .vin-table-actions button:hover {
-          color: #2563eb;
-          border-color: #bfdbfe;
-          background: #eff6ff;
+          color: var(--color-primary, #2f8f7f);
+          border-color: #a7d8cf;
+          background: var(--color-primary-light, #e8f5f1);
         }
 
         .vin-actions .vin-delete-action:hover {
@@ -1874,10 +2013,10 @@ const Medicines = () => {
 
         .vin-table-card {
           overflow: hidden;
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--color-surface, white);
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 18px;
-          box-shadow: 0 5px 17px rgba(15, 23, 42, 0.05);
+          box-shadow: var(--shadow-soft, 0 5px 17px rgba(15, 23, 42, 0.05));
         }
 
         .vin-table-scroll {
@@ -1931,8 +2070,8 @@ const Medicines = () => {
           align-items: center;
           justify-content: center;
           border-radius: 9px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--color-primary-light, #e8f5f1);
+          color: var(--color-primary, #2f8f7f);
         }
 
         .vin-table-med strong {
@@ -1975,8 +2114,8 @@ const Medicines = () => {
           align-items: center;
           justify-content: center;
           text-align: center;
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--color-surface, white);
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 18px;
         }
 
@@ -1988,23 +2127,26 @@ const Medicines = () => {
           justify-content: center;
           margin-bottom: 14px;
           border-radius: 18px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--color-primary-light, #e8f5f1);
+          color: var(--color-primary, #2f8f7f);
         }
 
         .vin-empty-card h3 {
           margin: 0;
-          color: #334155;
+          color: var(--color-text, #334155);
         }
 
         .vin-empty-card p {
           margin: 7px 0 18px;
           max-width: 420px;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 13px;
         }
 
         .vin-error {
+          display: flex;
+          align-items: center;
+          gap: 8px;
           margin-bottom: 16px;
           padding: 12px 15px;
           border-radius: 12px;
@@ -2030,7 +2172,7 @@ const Medicines = () => {
           width: min(700px, 100%);
           max-height: 90vh;
           overflow-y: auto;
-          background: white;
+          background: var(--color-surface, white);
           border-radius: 20px;
           padding: 25px;
           box-shadow: 0 25px 70px rgba(15, 23, 42, 0.18);
@@ -2056,13 +2198,13 @@ const Medicines = () => {
         .vin-modal-header h2,
         .vin-detail-header h2 {
           margin: 0;
-          color: #334155;
+          color: var(--color-text, #334155);
           font-size: 20px;
         }
 
         .vin-modal-header p {
           margin: 5px 0 0;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 13px;
         }
 
@@ -2095,10 +2237,20 @@ const Medicines = () => {
           font-size: 22px;
         }
 
-        .vin-detail-header p {
-          margin: 5px 0 0;
-          color: #94a3b8;
-          font-size: 13px;
+        .vin-detail-meta {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 6px;
+          color: var(--color-text-muted, #94a3b8);
+          font-size: 12px;
+        }
+
+        .vin-detail-meta span {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
         }
 
         .vin-detail-grid {
@@ -2113,9 +2265,9 @@ const Medicines = () => {
           align-items: center;
           gap: 10px;
           padding: 14px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 14px;
-          background: #f8fafc;
+          background: var(--color-surface-alt, #f8fafc);
         }
 
         .vin-detail-card-icon {
@@ -2125,8 +2277,8 @@ const Medicines = () => {
           align-items: center;
           justify-content: center;
           border-radius: 10px;
-          background: white;
-          color: #2563eb;
+          background: var(--color-surface, white);
+          color: var(--color-primary, #2f8f7f);
         }
 
         .vin-detail-card small,
@@ -2135,7 +2287,7 @@ const Medicines = () => {
         }
 
         .vin-detail-card small {
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 10px;
         }
 
@@ -2147,18 +2299,18 @@ const Medicines = () => {
 
         .vin-section-header h3 {
           margin: 0;
-          color: #334155;
+          color: var(--color-text, #334155);
           font-size: 16px;
         }
 
         .vin-section-header p {
           margin: 5px 0 14px;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 12px;
         }
 
         .vin-history-list {
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 14px;
           overflow: hidden;
         }
@@ -2180,7 +2332,7 @@ const Medicines = () => {
           font-size: 13px;
         }
 
-        .vin-history-item span {
+        .vin-history-item > div span {
           margin-left: 10px;
           color: #94a3b8;
           font-size: 11px;
@@ -2189,6 +2341,9 @@ const Medicines = () => {
         .vin-history-status {
           margin-left: 0 !important;
           padding: 5px 8px;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
           border-radius: 999px;
           font-size: 10px !important;
           font-weight: 700;
@@ -2210,16 +2365,46 @@ const Medicines = () => {
         }
 
         .vin-history-empty {
-          padding: 30px;
+          min-height: 90px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 20px;
           text-align: center;
-          color: #94a3b8;
-          border: 1px solid #e2e8f0;
+          color: var(--color-text-muted, #94a3b8);
+          border: 1px solid var(--color-border, #e2e8f0);
           border-radius: 14px;
           font-size: 13px;
         }
 
+        .vin-status-message {
+          min-height: 90px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          color: var(--color-text-muted, #94a3b8);
+          font-size: 13px;
+        }
+
+        .vin-loading-icon,
+        .vin-spin {
+          animation: vin-spin 1s linear infinite;
+        }
+
+        @keyframes vin-spin {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
         .vin-muted {
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 13px;
         }
 
@@ -2236,28 +2421,30 @@ const Medicines = () => {
         }
 
         .vin-small-modal h2 {
-          color: #334155;
+          color: var(--color-text, #334155);
         }
 
         .vin-delete-text {
           margin: 8px 0 20px;
-          color: #94a3b8;
+          color: var(--color-text-muted, #94a3b8);
           font-size: 13px;
           line-height: 1.5;
         }
 
-        .vin-danger-btn {
-          color: white;
-          background: #ef4444;
-        }
-
         .vin-refill-summary {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           margin-top: 12px;
           padding: 11px 13px;
           border-radius: 11px;
-          background: #f8fafc;
-          color: #64748b;
+          background: var(--color-surface-alt, #f8fafc);
+          color: var(--color-text-muted, #64748b);
           font-size: 12px;
+        }
+
+        .vin-refill-summary strong {
+          color: var(--color-text, #334155);
         }
 
         @media (max-width: 1050px) {
@@ -2293,13 +2480,22 @@ const Medicines = () => {
           .vin-medicine-header .vin-primary-btn {
             width: 100%;
           }
+
+          .vin-view-toggle {
+            width: fit-content;
+          }
         }
       `}</style>
     </div>
   );
 };
 
+const SaveIcon = ({ saving }) => {
+  return saving ? (
+    <RefreshCw size={16} className="vin-spin" />
+  ) : (
+    <CheckCircle2 size={16} />
+  );
+};
+
 export default Medicines;
-
-
-

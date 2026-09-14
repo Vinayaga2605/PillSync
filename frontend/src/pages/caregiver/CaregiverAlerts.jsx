@@ -7,6 +7,11 @@ import {
   Clock3,
   Pill,
   RefreshCw,
+  RotateCcw,
+  Eye,
+  MailOpen,
+  CircleAlert,
+  ShieldAlert,
 } from "lucide-react";
 
 import caregiverService from "../../services/caregiverService";
@@ -34,7 +39,10 @@ const CaregiverAlerts = () => {
 
       setAlerts(normalizedAlerts);
     } catch (err) {
-      console.error("Failed to load caregiver alerts:", err);
+      console.error(
+        "Failed to load caregiver alerts:",
+        err
+      );
 
       setError(
         "Unable to load caregiver alerts. Please try again."
@@ -95,19 +103,30 @@ const CaregiverAlerts = () => {
     );
   };
 
+  const getFilterIcon = (item) => {
+    if (item === "Unread") {
+      return <MailOpen size={13} />;
+    }
+
+    if (item === "Read") {
+      return <Eye size={13} />;
+    }
+
+    return <Bell size={13} />;
+  };
+
   return (
     <div className="caregiver-alerts-page">
       <style>{styles}</style>
 
-      {/* HEADER */}
       <div className="caregiver-alerts-header">
         <div>
           <div className="caregiver-alerts-kicker">
             <Bell size={15} />
-            CAREGIVER ALERTS
+            <span>CAREGIVER ALERTS</span>
           </div>
 
-          <h1>Alerts & Notifications</h1>
+          <h1>Alerts &amp; Notifications</h1>
 
           <p>
             Review missed doses, refill warnings and important
@@ -117,6 +136,7 @@ const CaregiverAlerts = () => {
 
         <div className="alerts-header-actions">
           <button
+            type="button"
             className="alerts-refresh-btn"
             onClick={fetchAlerts}
             disabled={loading}
@@ -125,36 +145,42 @@ const CaregiverAlerts = () => {
               size={14}
               className={loading ? "alerts-spin" : ""}
             />
-            Refresh
+            <span>Refresh</span>
           </button>
 
           {unreadCount > 0 && (
             <button
+              type="button"
               className="alerts-primary-btn"
               onClick={markAllAsRead}
             >
               <CheckCircle2 size={16} />
-              Mark All Read
+              <span>Mark All Read</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* ERROR */}
       {error && (
-        <div className="alerts-error">
-          <span>{error}</span>
+        <div className="alerts-error" role="alert">
+          <div className="alerts-error-main">
+            <CircleAlert size={16} />
+            <span>{error}</span>
+          </div>
 
-          <button onClick={fetchAlerts}>
-            Try Again
+          <button
+            type="button"
+            onClick={fetchAlerts}
+          >
+            <RotateCcw size={14} />
+            <span>Try Again</span>
           </button>
         </div>
       )}
 
-      {/* SUMMARY */}
       <div className="alerts-summary">
         <AlertSummary
-          icon={<AlertTriangle size={20} />}
+          icon={<ShieldAlert size={20} />}
           label="Critical Alerts"
           value={criticalCount}
           tone="danger"
@@ -182,7 +208,6 @@ const CaregiverAlerts = () => {
         />
       </div>
 
-      {/* ALERT CARD */}
       <section className="alerts-card">
         <div className="alerts-card-header">
           <div className="alerts-title">
@@ -198,16 +223,21 @@ const CaregiverAlerts = () => {
             </div>
           </div>
 
-          <div className="alerts-filter">
+          <div
+            className="alerts-filter"
+            aria-label="Alert filter"
+          >
             {["All", "Unread", "Read"].map((item) => (
               <button
+                type="button"
                 key={item}
                 className={
                   filter === item ? "active" : ""
                 }
                 onClick={() => setFilter(item)}
               >
-                {item}
+                {getFilterIcon(item)}
+                <span>{item}</span>
               </button>
             ))}
           </div>
@@ -220,7 +250,9 @@ const CaregiverAlerts = () => {
                 size={34}
                 className="alerts-spin"
               />
+
               <strong>Loading alerts...</strong>
+
               <span>
                 Fetching the latest patient updates.
               </span>
@@ -228,7 +260,9 @@ const CaregiverAlerts = () => {
           ) : filteredAlerts.length === 0 ? (
             <div className="alerts-empty">
               <CheckCircle2 size={34} />
+
               <strong>No alerts found</strong>
+
               <span>
                 Everything is up to date for the selected filter.
               </span>
@@ -269,7 +303,7 @@ const CaregiverAlerts = () => {
 
                     <small>
                       <Clock3 size={12} />
-                      {alert.time}
+                      <span>{alert.time}</span>
                     </small>
                   </div>
 
@@ -279,30 +313,57 @@ const CaregiverAlerts = () => {
                     <span
                       className={`alert-type ${alert.type}`}
                     >
-                      {alert.type === "danger"
-                        ? "Attention required"
-                        : alert.type === "warning"
-                        ? "Refill warning"
-                        : "Completed"}
+                      {alert.type === "danger" ? (
+                        <>
+                          <AlertTriangle size={11} />
+                          <span>Attention required</span>
+                        </>
+                      ) : alert.type === "warning" ? (
+                        <>
+                          <Package size={11} />
+                          <span>Refill warning</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 size={11} />
+                          <span>Completed</span>
+                        </>
+                      )}
                     </span>
 
                     <span className="alert-status">
-                      {alert.status}
+                      {alert.status === "Unread" ? (
+                        <>
+                          <Bell size={10} />
+                          <span>Unread</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 size={10} />
+                          <span>Read</span>
+                        </>
+                      )}
                     </span>
                   </div>
                 </div>
 
                 {alert.status === "Unread" ? (
                   <button
+                    type="button"
                     className="alert-action"
                     onClick={() =>
                       markAsRead(alert.id)
                     }
+                    title="Mark alert as read"
                   >
-                    Mark Read
+                    <MailOpen size={13} />
+                    <span>Mark Read</span>
                   </button>
                 ) : (
-                  <div className="alert-read-icon">
+                  <div
+                    className="alert-read-icon"
+                    title="Alert has been read"
+                  >
                     <CheckCircle2 size={17} />
                   </div>
                 )}
@@ -312,7 +373,6 @@ const CaregiverAlerts = () => {
         </div>
       </section>
 
-      {/* CAREGIVER TIP */}
       <section className="caregiver-alert-tip">
         <div className="tip-icon">
           <Pill size={18} />
@@ -320,6 +380,7 @@ const CaregiverAlerts = () => {
 
         <div>
           <strong>Caregiver tip</strong>
+
           <p>
             Pay special attention to repeated missed doses and
             medicines with low remaining stock.
@@ -419,6 +480,7 @@ const formatAlertTime = (value) => {
   }
 
   const diff = Date.now() - date.getTime();
+
   const minutes = Math.floor(
     diff / (1000 * 60)
   );
@@ -510,18 +572,23 @@ const styles = `
   gap: 8px;
 }
 
-.alerts-refresh-btn {
+.alerts-refresh-btn,
+.alerts-primary-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
-  border: 1px solid #dfe8e5;
   border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.alerts-refresh-btn {
+  border: 1px solid #dfe8e5;
   padding: 10px 13px;
   background: #fff;
   color: #2f8f7f;
-  cursor: pointer;
   font-size: 10px;
-  font-weight: 700;
 }
 
 .alerts-refresh-btn:hover {
@@ -534,17 +601,12 @@ const styles = `
 }
 
 .alerts-primary-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   border: 0;
   border-radius: 11px;
   padding: 11px 16px;
   background: #2f8f7f;
   color: #fff;
-  cursor: pointer;
   font-size: 11px;
-  font-weight: 700;
   box-shadow: 0 5px 16px rgba(47,143,127,.15);
 }
 
@@ -566,7 +628,22 @@ const styles = `
   font-size: 12px;
 }
 
+.alerts-error-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.alerts-error-main span {
+  overflow-wrap: anywhere;
+}
+
 .alerts-error button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
   border: 0;
   border-radius: 7px;
   padding: 7px 10px;
@@ -575,6 +652,10 @@ const styles = `
   cursor: pointer;
   font-size: 10px;
   font-weight: 700;
+}
+
+.alerts-error button:hover {
+  background: #a3423b;
 }
 
 .alerts-summary {
@@ -695,6 +776,10 @@ const styles = `
 }
 
 .alerts-filter button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   border: 0;
   border-radius: 7px;
   padding: 8px 12px;
@@ -801,12 +886,15 @@ const styles = `
 .alert-meta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .alert-type,
 .alert-status {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 7px;
   border-radius: 7px;
   font-size: 8px;
@@ -834,6 +922,10 @@ const styles = `
 }
 
 .alert-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
   border: 0;
   border-radius: 8px;
   padding: 7px 10px;
@@ -850,6 +942,9 @@ const styles = `
 }
 
 .alert-read-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #2f8f7f;
   padding: 5px;
 }
@@ -871,6 +966,7 @@ const styles = `
 
 .alerts-empty span {
   font-size: 10px;
+  text-align: center;
 }
 
 .caregiver-alert-tip {
@@ -958,11 +1054,14 @@ const styles = `
   .alerts-refresh-btn,
   .alerts-primary-btn {
     flex: 1;
-    justify-content: center;
   }
 
   .alerts-summary {
     grid-template-columns: 1fr;
+  }
+
+  .care-alert {
+    flex-wrap: wrap;
   }
 
   .care-alert-heading {
@@ -970,13 +1069,23 @@ const styles = `
     gap: 5px;
   }
 
+  .care-alert-heading small {
+    white-space: normal;
+  }
+
   .alert-action {
-    display: none;
+    width: 100%;
+    justify-content: center;
   }
 
   .alerts-error {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .alerts-error button {
+    width: 100%;
+    justify-content: center;
   }
 }
 `;

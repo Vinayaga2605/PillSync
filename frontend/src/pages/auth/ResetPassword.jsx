@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./ResetPassword.css";
 import authService from "../../services/authService";
@@ -14,6 +14,12 @@ function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!uid || !token) {
+      console.warn("Reset page opened without uid/token.");
+    }
+  }, [uid, token]);
+
   const handleReset = async (e) => {
     e.preventDefault();
 
@@ -23,35 +29,52 @@ function ResetPassword() {
     }
 
     if (!newPassword.trim() || !confirmPassword.trim()) {
-      alert("Please enter both passwords");
+      alert("Please enter both passwords.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
+      alert("Passwords do not match.");
       return;
     }
 
     if (newPassword.length < 8) {
-      alert("Password must contain at least 8 characters");
+      alert("Password must contain at least 8 characters.");
       return;
     }
 
     setLoading(true);
 
     try {
-      await authService.resetPassword(token, newPassword);
+      const response = await authService.resetPassword(
+        uid,
+        token,
+        newPassword,
+        confirmPassword
+      );
 
-      alert("Password changed successfully!");
-      navigate("/login");
+      alert(
+        response?.message ||
+          "Password reset successfully. You can now log in."
+      );
+
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Reset password error:", error);
 
-      alert(
-        error?.response?.data?.detail ||
-          error?.response?.data?.message ||
-          "Password reset failed"
-      );
+      const errorData = error?.response?.data;
+
+      let message =
+        errorData?.error ||
+        errorData?.detail ||
+        errorData?.message ||
+        "Password reset failed.";
+
+      if (typeof errorData === "object" && !message) {
+        message = Object.values(errorData).flat().join(" ");
+      }
+
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -75,6 +98,7 @@ function ResetPassword() {
           placeholder="Enter new password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
+          disabled={loading}
         />
 
         <label>Confirm Password</label>
@@ -84,6 +108,7 @@ function ResetPassword() {
           placeholder="Re-enter new password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          disabled={loading}
         />
 
         <button type="submit" disabled={loading}>
@@ -105,6 +130,3 @@ function ResetPassword() {
 }
 
 export default ResetPassword;
-
-
-

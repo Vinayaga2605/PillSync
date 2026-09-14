@@ -1,419 +1,497 @@
 ﻿import React from "react";
-import NotificationPanel from "../../components/NotificationPanel";
-import PushNotification from "../../components/PushNotification";
-import NotificationHistory from "../../components/NotificationHistory";
+import { Bell } from "lucide-react";
+
+import NotificationPanel from "../../components/notifications/NotificationPanel";
+import PushNotification from "../../components/notifications/PushNotification";
+import NotificationHistory from "../../components/notifications/NotificationHistory";
+
+const styles = `
+  .pillsync-notifications-page {
+    min-height: 100%;
+    background: #f7f9fc;
+    padding: 28px;
+    color: #172033;
+    box-sizing: border-box;
+  }
+
+  .pillsync-notifications-page *,
+  .pillsync-notifications-page *::before,
+  .pillsync-notifications-page *::after {
+    box-sizing: border-box;
+  }
+
+  .pillsync-notifications-container {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  .pillsync-notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .pillsync-notifications-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .pillsync-notifications-header-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0f2fe;
+    color: #0284c7;
+  }
+
+  .pillsync-notifications-eyebrow {
+    margin: 0 0 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .pillsync-notifications-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #172033;
+  }
+
+  .pillsync-notifications-subtitle {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  .pillsync-notification-section {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e7ebf0;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+
+  .pillsync-section-header {
+    padding: 20px 22px;
+    border-bottom: 1px solid #edf1f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .pillsync-section-header h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .pillsync-section-header p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  .pillsync-section-body {
+    padding: 20px 22px;
+  }
+
+  .pillsync-count-badge {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .pillsync-clear-btn {
+    border: 1px solid #fecaca;
+    background: #fff;
+    color: #dc2626;
+    padding: 8px 12px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .pillsync-clear-btn:hover {
+    background: #fef2f2;
+  }
+
+  .pillsync-notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pillsync-notification-item {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #e7ebf0;
+    border-radius: 14px;
+    background: #fff;
+    transition: 0.2s ease;
+  }
+
+  .pillsync-notification-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.04);
+  }
+
+  .pillsync-notification-item.unread {
+    background: #f8fbff;
+    border-color: #bfdbfe;
+  }
+
+  .pillsync-notification-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #2563eb;
+  }
+
+  .pillsync-notification-item.unread .pillsync-notification-icon {
+    background: #e0f2fe;
+    color: #0284c7;
+  }
+
+  .pillsync-notification-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pillsync-notification-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pillsync-notification-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #172033;
+  }
+
+  .pillsync-new-badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .pillsync-notification-message {
+    margin: 7px 0;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .pillsync-notification-time {
+    color: #94a3b8;
+    font-size: 11px;
+  }
+
+  .pillsync-notification-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 11px;
+  }
+
+  .pillsync-action-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 7px 11px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .pillsync-read-btn {
+    background: #ecfdf5;
+    color: #047857;
+  }
+
+  .pillsync-read-btn:hover {
+    background: #d1fae5;
+  }
+
+  .pillsync-delete-btn {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+
+  .pillsync-delete-btn:hover {
+    background: #fee2e2;
+  }
+
+  .pillsync-empty-state {
+    text-align: center;
+    padding: 42px 20px;
+  }
+
+  .pillsync-empty-icon {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 12px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #94a3b8;
+  }
+
+  .pillsync-empty-state h3 {
+    margin: 0 0 5px;
+    color: #334155;
+    font-size: 15px;
+  }
+
+  .pillsync-empty-state p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  .pillsync-error {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    font-size: 12px;
+  }
+
+  .pillsync-push-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .pillsync-toggle {
+    min-width: 64px;
+    border: none;
+    border-radius: 9px;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .pillsync-toggle.on {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  .pillsync-toggle.off {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+
+  .pillsync-toggle:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .pillsync-push-status {
+    margin-top: 18px;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e7ebf0;
+  }
+
+  .pillsync-push-status-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0f2fe;
+    color: #0284c7;
+  }
+
+  .pillsync-push-status strong {
+    display: block;
+    color: #334155;
+    font-size: 13px;
+  }
+
+  .pillsync-push-status p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .pillsync-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pillsync-history-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #e7ebf0;
+    border-radius: 12px;
+  }
+
+  .pillsync-history-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e7ebf0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6366f1;
+  }
+
+  .pillsync-history-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pillsync-history-content h4 {
+    margin: 0 0 4px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .pillsync-history-content p {
+    margin: 0 0 4px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .pillsync-history-content small {
+    color: #94a3b8;
+    font-size: 10px;
+  }
+
+  .pillsync-history-status {
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .pillsync-history-status.viewed {
+    background: #ecfdf5;
+    color: #047857;
+  }
+
+  .pillsync-history-status.new {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  @media (max-width: 768px) {
+    .pillsync-notifications-page {
+      padding: 18px 14px;
+    }
+
+    .pillsync-notifications-header {
+      align-items: flex-start;
+    }
+
+    .pillsync-notifications-title {
+      font-size: 24px;
+    }
+
+    .pillsync-section-header,
+    .pillsync-push-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .pillsync-notification-item {
+      align-items: flex-start;
+    }
+
+    .pillsync-history-item {
+      align-items: flex-start;
+    }
+  }
+`;
 
 function Notifications() {
   return (
-    <>
-      <style>{`
-        .pavani-notifications-page {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 30px 20px;
-          font-family: Arial, sans-serif;
-          background: #f4f8fb;
-          min-height: 100vh;
-          box-sizing: border-box;
-        }
-
-        .pavani-notifications-page *,
-        .pavani-notifications-page *::before,
-        .pavani-notifications-page *::after {
-          box-sizing: border-box;
-        }
-
-        .pavani-notifications-title {
-          text-align: center;
-          margin: 0 0 30px;
-          color: #0d6efd;
-          font-size: 32px;
-          font-weight: 500;
-        }
-
-        .pavani-notification-panel,
-        .pavani-push-notification,
-        .pavani-notification-history {
-          width: 100%;
-          background: #ffffff;
-          padding: 24px;
-          border-radius: 16px;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .pavani-notification-panel {
-          margin-bottom: 20px;
-        }
-
-        .pavani-panel-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 15px;
-          margin-bottom: 15px;
-        }
-
-        .pavani-panel-header h2,
-        .pavani-push-notification h2,
-        .pavani-notification-history h2 {
-          margin: 0 0 6px;
-          color: #222222;
-          font-size: 22px;
-          font-weight: 500;
-        }
-
-        .pavani-panel-subtitle {
-          margin: 0;
-          color: #777777;
-          font-size: 14px;
-        }
-
-        .pavani-notification-count {
-          background: #0d6efd;
-          color: white;
-          padding: 7px 12px;
-          border-radius: 20px;
-          font-size: 13px;
-          font-weight: bold;
-          white-space: nowrap;
-        }
-
-        .pavani-clear-all-container {
-          text-align: right;
-          margin-bottom: 15px;
-        }
-
-        .pavani-clear-all-btn {
-          background: transparent;
-          color: #dc3545;
-          border: 1px solid #dc3545;
-          padding: 7px 12px;
-          border-radius: 7px;
-          cursor: pointer;
-        }
-
-        .pavani-clear-all-btn:hover {
-          background: #dc3545;
-          color: white;
-        }
-
-        .pavani-notification-card {
-          display: flex;
-          gap: 15px;
-          width: 100%;
-          padding: 16px;
-          margin-bottom: 14px;
-          border-radius: 12px;
-          background: #f8f9fa;
-          border-left: 5px solid #cccccc;
-        }
-
-        .pavani-notification-card.unread {
-          border-left-color: #dc3545;
-          background: #fff8f8;
-        }
-
-        .pavani-notification-card.read {
-          border-left-color: #198754;
-        }
-
-        .pavani-notification-icon {
-          width: 45px;
-          height: 45px;
-          min-width: 45px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: white;
-          border-radius: 50%;
-          font-size: 22px;
-        }
-
-        .pavani-notification-content {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .pavani-notification-title-row {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-
-        .pavani-notification-title-row h3 {
-          margin: 0;
-          color: #222222;
-          font-size: 17px;
-          font-weight: 600;
-        }
-
-        .pavani-notification-content p {
-          margin: 7px 0;
-          color: #555555;
-        }
-
-        .pavani-notification-content small {
-          color: #888888;
-        }
-
-        .pavani-new-badge {
-          background: #dc3545;
-          color: white;
-          font-size: 10px;
-          padding: 3px 7px;
-          border-radius: 10px;
-          font-weight: bold;
-        }
-
-        .pavani-notification-buttons {
-          display: flex;
-          gap: 8px;
-          margin-top: 12px;
-        }
-
-        .pavani-notification-buttons button {
-          padding: 7px 12px;
-          border: none;
-          border-radius: 7px;
-          cursor: pointer;
-        }
-
-        .pavani-read-btn {
-          background: #198754;
-          color: white;
-        }
-
-        .pavani-delete-btn {
-          background: #dc3545;
-          color: white;
-        }
-
-        .pavani-notification-buttons button:hover {
-          opacity: 0.85;
-        }
-
-        .pavani-empty-notifications {
-          text-align: center;
-          padding: 40px 20px;
-        }
-
-        .pavani-empty-icon {
-          font-size: 45px;
-          margin-bottom: 10px;
-        }
-
-        .pavani-empty-notifications h3 {
-          margin: 0 0 5px;
-          color: #222222;
-        }
-
-        .pavani-empty-notifications p {
-          color: #777777;
-          margin: 0;
-        }
-
-        .pavani-notification-error {
-          color: #dc3545;
-          margin-bottom: 15px;
-        }
-
-        .pavani-push-notification {
-          margin-bottom: 20px;
-        }
-
-        .pavani-push-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 10px;
-        }
-
-        .pavani-push-header p {
-          color: #666666;
-          line-height: 1.5;
-          margin: 0;
-        }
-
-        .pavani-notification-toggle {
-          padding: 10px 18px;
-          border: none;
-          border-radius: 8px;
-          color: white;
-          cursor: pointer;
-          font-weight: bold;
-          min-width: 70px;
-        }
-
-        .pavani-notification-toggle.enabled {
-          background: #198754;
-        }
-
-        .pavani-notification-toggle.disabled {
-          background: #dc3545;
-        }
-
-        .pavani-notification-toggle:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-
-        .pavani-push-status {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          padding: 15px;
-          margin-top: 20px;
-          background: #f8f9fa;
-          border-radius: 10px;
-        }
-
-        .pavani-push-icon {
-          font-size: 32px;
-          min-width: 45px;
-        }
-
-        .pavani-push-status strong {
-          color: #222222;
-        }
-
-        .pavani-push-status p {
-          margin: 5px 0 0;
-          color: #666666;
-        }
-
-        .pavani-notification-history {
-          margin-top: 0;
-        }
-
-        .pavani-history-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-        }
-
-        .pavani-history-header h2 {
-          margin-bottom: 5px;
-        }
-
-        .pavani-history-header p {
-          margin: 0;
-          color: #777777;
-        }
-
-        .pavani-history-count {
-          background: #6c757d;
-          color: white;
-          padding: 7px 12px;
-          border-radius: 20px;
-        }
-
-        .pavani-history-card {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          padding: 15px;
-          margin-bottom: 12px;
-          background: #f8f9fa;
-          border-radius: 10px;
-        }
-
-        .pavani-history-icon {
-          font-size: 24px;
-          width: 45px;
-          height: 45px;
-          min-width: 45px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: white;
-          border-radius: 50%;
-        }
-
-        .pavani-history-content {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .pavani-history-content h4 {
-          margin: 0 0 5px;
-          color: #222222;
-        }
-
-        .pavani-history-content p {
-          margin: 0 0 5px;
-          color: #555555;
-        }
-
-        .pavani-history-content small {
-          color: #888888;
-        }
-
-        .pavani-history-status {
-          padding: 5px 9px;
-          border-radius: 12px;
-          font-size: 11px;
-          font-weight: bold;
-          white-space: nowrap;
-        }
-
-        .pavani-history-status.viewed {
-          background: #cff4fc;
-          color: #055160;
-        }
-
-        .pavani-history-status.new {
-          background: #f8d7da;
-          color: #842029;
-        }
-
-        @media (max-width: 768px) {
-          .pavani-notifications-page {
-            padding: 20px 12px;
-          }
-
-          .pavani-panel-header {
-            flex-direction: column;
-          }
-
-          .pavani-notification-card {
-            flex-direction: column;
-          }
-
-          .pavani-notification-buttons {
-            flex-direction: column;
-          }
-
-          .pavani-notification-buttons button {
-            width: 100%;
-          }
-
-          .pavani-history-card {
-            align-items: flex-start;
-            flex-wrap: wrap;
-          }
-
-          .pavani-history-status {
-            margin-left: 60px;
-          }
-        }
-      `}</style>
-
-      <div className="pavani-notifications-page">
-        <h1 className="pavani-notifications-title">
-          🔔 Notifications
-        </h1>
+    <div className="pillsync-notifications-page">
+      <style>{styles}</style>
+
+      <div className="pillsync-notifications-container">
+        <header className="pillsync-notifications-header">
+          <div className="pillsync-notifications-header-left">
+            <div className="pillsync-notifications-header-icon">
+              <Bell size={24} />
+            </div>
+
+            <div>
+              <p className="pillsync-notifications-eyebrow">
+                Medication Center
+              </p>
+
+              <h1 className="pillsync-notifications-title">
+                Notifications
+              </h1>
+
+              <p className="pillsync-notifications-subtitle">
+                Stay updated with medication reminders, missed doses, and
+                refill alerts.
+              </p>
+            </div>
+          </div>
+        </header>
 
         <NotificationPanel />
         <PushNotification />
         <NotificationHistory />
       </div>
-    </>
+    </div>
   );
 }
 
 export default Notifications;
-
-
-
